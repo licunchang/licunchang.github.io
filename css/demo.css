@@ -2,6 +2,7 @@ body {
 	background: #123;
 	color: #333;
 	height: auto;
+	font: 13px/1.5 Arial;
 	padding-bottom: 20px;
 }
 a {

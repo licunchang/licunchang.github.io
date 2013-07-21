@@ -24,20 +24,20 @@ span.backtick {
 	padding: 0 3px 0 3px;
 }
 : : -moz-selection {
-	background: rgba(255,255,0,0.3);
-	color: #000
+ background: rgba(255, 255, 0, 0.3);
+ color: #000
 }
 : : selection {
-	background: rgba(255,255,0,0.3);
-	color: #000
+ background: rgba(255, 255, 0, 0.3);
+ color: #000
 }
 a: : -moz-selection {
-	background: rgba(255,255,0,0.3);
-	color: #0645ad
+ background: rgba(255, 255, 0, 0.3);
+ color: #0645ad
 }
 a: : selection {
-	background: rgba(255,255,0,0.3);
-	color: #0645ad
+ background: rgba(255, 255, 0, 0.3);
+ color: #0645ad
 }
 p {
 	margin: 1em 0;
@@ -45,7 +45,7 @@ p {
 img {
 	max-width: 100%;
 }
-h1,h2,h3,h4,h5,h6 {
+h1, h2, h3, h4, h5, h6 {
 	font-weight: bold;
 	color: #111;
 	line-height: 1em;
@@ -85,10 +85,10 @@ hr {
 	margin: 1em 0;
 	padding: 0;
 }
-pre , code, kbd, samp {
+pre, code, kbd, samp {
 	color: #000;
 	font-family: Consolas, "Courier New";
-    font-size: 13px;
+	font-size: 13px;
 	border-radius: 3px;
 	background-color: #F8F8F8;
 	border: 1px solid #CCC;
@@ -104,15 +104,15 @@ pre code {
 	padding: 0;
 }
 code {
-    padding-bottom: 0px;
-    padding-left: 5px;
-    padding-right: 5px;
-    padding-top: 0px;
-    margin-bottom: 0px;
-    margin-left: 2px;
-    margin-right: 2px;
-    margin-top: 0px;
-    border-radius: 3px;
+	padding-bottom: 0px;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 0px;
+	margin-bottom: 0px;
+	margin-left: 2px;
+	margin-right: 2px;
+	margin-top: 0px;
+	border-radius: 3px;
 }
 b, strong {
 	font-weight: bold;
@@ -148,7 +148,8 @@ ul, ol {
 	padding: 0 0 0 2em;
 }
 li p: last-child {
-	margin: 0 }
+	margin: 0
+}
 dd {
 	margin: 0 0 0 2em;
 }
@@ -165,7 +166,7 @@ td {
 	vertical-align: top;
 }
 @media print {
-	* {
+* {
 	background: transparent !important;
 	color: black !important;
 	filter: none !important;
@@ -191,7 +192,7 @@ abbr[title]: after {
 	content: " (" attr(title) ")";
 }
 .ir a: after, a[href^="javascript: "]: after, a[href^="#"]: after {
-	content: "";
+ content: "";
 }
 pre, blockquote {
 	border: 1px solid #999;
@@ -205,10 +206,10 @@ img {
 	max-width: 100% !important;
 }
 @page : left {
-	margin: 15mm 20mm 15mm 10mm;
+ margin: 15mm 20mm 15mm 10mm;
 }
 @page : right {
-	margin: 15mm 10mm 15mm 20mm;
+ margin: 15mm 10mm 15mm 20mm;
 }
 p, h2, h3 {
 	orphans: 3;
