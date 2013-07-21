@@ -45,6 +45,8 @@ body {
   float: left;
   margin-left: 10px;
   margin-right: 10px;
+  /*licunchang:margin-bottom*/
+  margin-bottom: 10px;
 }
 
 .push_1, .pull_1,
