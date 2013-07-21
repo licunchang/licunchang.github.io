@@ -53,7 +53,6 @@ a:hover {
 	color: #fff;
 	background-color:#0b75b2;
 } /* change the background color of the list item when you hover over it */
-
 .multipage .page {
 	margin: 0px 5px;
 	padding: 0;
@@ -62,4 +61,9 @@ a:hover {
 	text-decoration: none; /* removes the underline from the menu text */
 	color: #fff; /* text color of the menu */
 	padding: 5px 5px; /* 10.5px of padding to the right and left of the link and 11px to the top and bottom */
+}
+.footer{
+	color: #fff;
+	background-color: #0b75b2;
+	text-align:center;
 }
