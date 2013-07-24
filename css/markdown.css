@@ -2,19 +2,19 @@ a {
 	color: #0645ad;
 	text-decoration: none;
 }
-a: visited {
+a:visited {
 	color: #0b0080;
 }
-a: hover {
+a:hover {
 	color: #06e;
 }
-a: active {
+a:active {
 	color: #faa700;
 }
-a: focus {
-	outline: thin dotted;
+a:focus {
+	outline:thin dotted;
 }
-a: hover, a: active {
+a:hover, a:active {
 	outline: 0;
 }
 span.backtick {
@@ -23,19 +23,19 @@ span.backtick {
 	background: #F8F8F8;
 	padding: 0 3px 0 3px;
 }
-: : -moz-selection {
+::-moz-selection {
  background: rgba(255, 255, 0, 0.3);
  color: #000
 }
-: : selection {
+::selection {
  background: rgba(255, 255, 0, 0.3);
  color: #000
 }
-a: : -moz-selection {
+a::-moz-selection {
  background: rgba(255, 255, 0, 0.3);
  color: #0645ad
 }
-a: : selection {
+a::selection {
  background: rgba(255, 255, 0, 0.3);
  color: #0645ad
 }
@@ -147,7 +147,7 @@ ul, ol {
 	margin: 1em 0;
 	padding: 0 0 0 2em;
 }
-li p: last-child {
+li p:last-child {
 	margin: 0
 }
 dd {
@@ -177,7 +177,7 @@ body {
 	max-width: 100%;
 	outline: none;
 }
-a, a: visited {
+a, a:visited {
 	text-decoration: underline;
 }
 hr {
@@ -185,13 +185,13 @@ hr {
 	border: 0;
 	border-bottom: 1px solid black;
 }
-a[href]: after {
+a[href]:after {
 	content: " (" attr(href) ")";
 }
-abbr[title]: after {
+abbr[title]:after {
 	content: " (" attr(title) ")";
 }
-.ir a: after, a[href^="javascript: "]: after, a[href^="#"]: after {
+.ir a:after, a[href^="javascript: "]:after, a[href^="#"]:after {
  content: "";
 }
 pre, blockquote {
@@ -205,10 +205,10 @@ tr, img {
 img {
 	max-width: 100% !important;
 }
-@page : left {
+@page :left {
  margin: 15mm 20mm 15mm 10mm;
 }
-@page : right {
+@page :right {
  margin: 15mm 10mm 15mm 20mm;
 }
 p, h2, h3 {
