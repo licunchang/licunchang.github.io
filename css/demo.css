@@ -2,8 +2,7 @@ body {
 	background: #123;
 	color: #333;
 	height: auto;
-	font: 13px/1.5 Arial;
-	padding-bottom: 20px;
+	font:12px/1.5 tahoma, arial, "Hiragino Sans GB", \5b8b\4f53;
 }
 a {
 	color: #fff;
@@ -22,6 +21,9 @@ a:hover {
 .header {
 	font-size:2.5em;
 	line-height:2.5em;
+}
+.header a:hover {
+	text-decoration: none;
 }
 .nav {
 	/* http://jamesowers.co.uk/pages/css_horizontal_menu/menu.html */
@@ -51,28 +53,32 @@ a:hover {
 	color: #fff;
 	background-color:#0b75b2;
 } /* change the background color of the list item when you hover over it */
-.list, .blog, .disqus{
-	padding:10px;
+.list, .blog, .disqus {
+	
 }
-.list .reference .title a{
+.list .reference .title a {
 	font-size:1.5em;
+}
+.list .reference {
+	padding:10px;
+	border-color:#D2D2D2;
+	border-style:dashed;
+	border-width:1px;
+	margin-bottom:10px;
 }
 .line {
 	border-bottom-color:#999;
 	border-bottom-style: dotted;
 	border-bottom-width: 1px;
 }
-.disqus{
-}
 .multipage {
+	width: 620px;
+	margin-left: auto;
+	margin-right: auto;
 	text-align:center;
-	margin: 0 auto;
-	width:100%;
 }
 .multipage .page {
-	margin: 0px 5px;
-	padding: 0;
-	float: left;
+	float:inherit;
 	display: inline;
 	text-decoration: none; /* removes the underline from the menu text */
 	color: #fff; /* text color of the menu */
@@ -82,5 +88,5 @@ a:hover {
 	color: #fff;
 	background-color: #0b75b2;
 	text-align:center;
-	padding-bottom: 20px;
+	line-height:40px;
 }
