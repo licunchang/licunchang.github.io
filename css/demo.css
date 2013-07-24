@@ -19,6 +19,10 @@ a:hover {
 	margin-top: 10px;
 }
 /*licunchang*/
+.header {
+	font-size:2.5em;
+	line-height:2.5em;
+}
 .nav {
 	/* http://jamesowers.co.uk/pages/css_horizontal_menu/menu.html */
 	width: 100%; /* The menu should be the entire width of it's surrounding object, in this case the whole page */
@@ -47,8 +51,18 @@ a:hover {
 	color: #fff;
 	background-color:#0b75b2;
 } /* change the background color of the list item when you hover over it */
-.list{
-	margin:10px;
+.list, .blog, .disqus{
+	padding:10px;
+}
+.list .reference .title a{
+	font-size:1.5em;
+}
+.line {
+	border-bottom-color:#999;
+	border-bottom-style: dotted;
+	border-bottom-width: 1px;
+}
+.disqus{
 }
 .multipage {
 	text-align:center;

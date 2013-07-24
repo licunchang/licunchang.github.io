@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans-CN">
+<head>
+<meta charset="utf-8" />
+<title>Home - EOFException</title>
+<link rel="stylesheet" href="css/reset.css" />
+<link rel="stylesheet" href="css/text.css" />
+<link rel="stylesheet" href="css/960_12_col.css" />
+<link rel="stylesheet" href="css/demo.css" />
+<link rel="stylesheet" href="css/markdown.css" />
+</head>
+<body>
+<div class="container_12">
+    <div class="grid_12">
+        <div class="header"> <a href="http://licunchang.com/">EOFException</a> </div>
+    </div>
+    <div class="clear"></div>
+    <!-- end .header -->
+    
+    <div class="grid_12">
+        <div class="nav">
+            <ul>
+                <li><a href="/" class="current">Home</a></li>
+                <li><a href="about.html">About</a></li>
+            </ul>
+            <div class="clear"></div>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <!-- end .nav -->
+    
+    <div class="grid_12">
+        <div class="blog">
+            <p><strong>File Name</strong> centos-nginx-mysql-php-memcached.md </p>
+            <p><strong>Description</strong> CentOS6.4下安装Nginx1.4.2-MySQL5.5.32-PHP5.4.14-Memcached1.4.15 <br />
+                <strong>Author</strong> LiCunchang(printf@live.com) <br />
+                <strong>Version</strong> 3.0.20130326 </p>
+            <hr />
+            <h2 id="1">1 准备</h2>
+            <h3 id="11-yum">1.1 yum源配置</h3>
+            <p>如果没有可用的网络进行yum(Yellow dog Updater, Modified)安装则需要配置本地的yum安装源，使用本地光盘作为yum源，如果有网络连接可用，则推荐使用163的yum源，跳过本步骤，具体详见<a href="http://mirrors.163.com/.help/centos.html">CentOS镜像使用帮助</a>。</p>
+            <pre><code>mkdir /mnt/cdrom
+mount /dev/cdrom /mnt/cdrom
+cd /etc/yum.repos.d/
+</code></pre>
+            <p>禁用掉系统中其他的yum源有两种方式： </p>
+            <p>1.将以.repo结尾的文件重命名 <br />
+                2.将每个配置文件中的enabled=1改为enabled=0 </p>
+            <pre><code>mv CentOS-Base.repo CentOS-Base.repo_licunchang.bak
+mv CentOS-Debuginfo.repo CentOS-Debuginfo.repo_licunchang.bak
+mv CentOS-Media.repo CentOS-Media.repo_licunchang.bak
+mv CentOS-Vault.repo CentOS-Vault.repo_licunchang.bak
+
+vi CentOS-Dvd.repo
+</code></pre>
+            <p>文件中添加：</p>
+            <pre><code>[c6-dvd]
+name=CentOS-$releasever - Dvd
+baseurl=file:///mnt/cdrom/
+gpgcheck=0
+enabled=1
+</code></pre>
+            <p>重建yum缓存</p>
+            <pre><code>yum makecache
+</code></pre>
+            <h3 id="12">1.2 编译工具等安装</h3>
+            <pre><code>yum -y install make cmake gcc gcc-c++ chkconfig automake autoconf
+</code></pre>
+            <h3 id="13">1.3 所需源码包</h3>
+            <ul>
+                <li>nginx-1.4.2.tar.gz</li>
+                <li>openssl-1.0.1e.tar.gz</li>
+                <li>pcre-8.32.tar.gz</li>
+                <li>mysql-5.5.32.tar.gz</li>
+                <li>php-5.4.14.tar.gz</li>
+                <li>libiconv-1.14.tar.gz</li>
+                <li>mcrypt-2.6.8.tar.gz</li>
+                <li>mhash-0.9.9.9.tar.gz</li>
+                <li>libmcrypt-2.5.8.tar.gz</li>
+                <li>libevent-2.0.21-stable.tar.gz</li>
+                <li>memcached-1.4.15.tar.gz</li>
+                <li>re2c-0.13.5.tar.gz</li>
+            </ul>
+            <p>所有的源码包放置在/usr/local/src目录下。</p>
+            <h2 id="2-mysql">2 MySQL</h2>
+            <h3 id="21">2.1 安装依赖包</h3>
+            <pre><code>yum -y install zlib zlib-devel ncurses ncurses-devel bison
+</code></pre>
+            <h3 id="22">2.2 创建运行账户及数据目录</h3>
+            <p>添加一个MySQL使用的用户和用户组：</p>
+            <pre><code>/usr/sbin/groupadd -r mysql
+/usr/sbin/useradd -g mysql -M -r -s /bin/false mysql
+</code></pre>
+            <p>将MySQL的数据文件放置在/data/mysql目录下，配置文件my.cnf放置在/etc/mysql目录下：</p>
+            <pre><code>mkdir -p /data/mysql
+chown -R mysql:mysql /data/mysql
+mkdir -p /etc/mysql
+chown -R mysql:mysql /etc/mysql
+</code></pre>
+            <h3 id="23">2.3 源码安装</h3>
+            <pre><code>cd /usr/local/src
+tar zxvf /usr/local/src/mysql-5.5.32.tar.gz
+cd /usr/local/src/mysql-5.5.32
+cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/data/mysql -DSYSCONFDIR=/etc/mysql -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci -DWITH_EXTRA_CHARSETS=all -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_ARCHIVE_STORAGE_ENGINE=1 -DWITH_BLACKHOLE_STORAGE_ENGINE=1 -DWITH_PERFSCHEMA_STORAGE_ENGINE=1 -DWITHOUT_EXAMPLE_STORAGE_ENGINE=1 -DWITHOUT_FEDERATED_STORAGE_ENGINE=1 -DWITHOUT_PARTITION_STORAGE_ENGINE=1 -DWITH_READLINE=1 -DWITH_LIBWRAP=1 -DENABLED_LOCAL_INFILE=1 -DENABLED_PROFILING=1 -DMYSQL_TCP_PORT=3306 -DWITH_ZLIB=system
+make
+make install
+</code></pre>
+            <h3 id="24-mycnf">2.4 配置my.cnf文件</h3>
+            <pre><code>rm -f /etc/my.cnf
+</code></pre>
+            <p>系统提供了几个配置文件样例，可根据系统资源情况进行设置，各配置文件的说明如下： </p>
+            <ul>
+                <li>my-huge.cnf </li>
+            </ul>
+            <blockquote>
+                <p>This is for a large system with memory of 1G-2G where the system runs mainly MySQL. </p>
+            </blockquote>
+            <ul>
+                <li>my-large.cnf </li>
+            </ul>
+            <blockquote>
+                <p>This is for a large system with memory = 512M where the system runs mainly MySQL. </p>
+            </blockquote>
+            <ul>
+                <li>my-medium.cnf</li>
+            </ul>
+            <blockquote>
+                <p>This is for a system with little memory (32M - 64M) where MySQL plays an important part, or systems up to 128M where MySQL is used together with other programs (such as a web server). </p>
+            </blockquote>
+            <ul>
+                <li>my-small.cnf </li>
+            </ul>
+            <blockquote>
+                <p>This is for a system with little memory (&lt;= 64M) where MySQL is only used from time to time and it's important that the mysqld daemon doesn't use much resources. </p>
+            </blockquote>
+            <ul>
+                <li>my-innodb-heavy-4G.cnf</li>
+            </ul>
+            <blockquote>
+                <p>This is a MySQL example config file for systems with 4GB of memory running mostly MySQL using InnoDB only tables and performing complex queries with few connections. </p>
+            </blockquote>
+            <pre><code>cd /usr/local/src/mysql-5.5.32
+cp ./support-files/my-medium.cnf /etc/mysql/my.cnf
+</code></pre>
+            <p>编辑my.cnf文件</p>
+            <pre><code>vi /etc/mysql/my.cnf
+</code></pre>
+            <p>添加字符集配置和慢查询日志，记录没有使用索引的查询，仅限测试环境调试。</p>
+            <pre><code>[client]
+default-character-set=utf8
+
+[mysqld]
+datadir=/data/mysql
+character_set_server=utf8
+collation-server=utf8_general_ci
+skip-character-set-client-handshake
+general-log
+log-warnings
+long_query_time=2
+slow-query-log
+log-queries-not-using-indexes
+innodb_file_per_table
+</code></pre>
+            <p>使用InnoDB打开以下选项</p>
+            <pre><code># Uncomment the following if you are using InnoDB tables
+innodb_data_home_dir = /data/mysql
+innodb_data_file_path = ibdata1:10M:autoextend
+innodb_log_group_home_dir = /data/mysql
+# You can set .._buffer_pool_size up to 50 - 80 %
+# of RAM but beware of setting memory usage too high
+innodb_buffer_pool_size = 16M
+innodb_additional_mem_pool_size = 2M
+# Set .._log_file_size to 25 % of buffer pool size
+innodb_log_file_size = 5M
+innodb_log_buffer_size = 8M
+innodb_flush_log_at_trx_commit = 1
+innodb_lock_wait_timeout = 50
+</code></pre>
+            <p>其中</p>
+            <ul>
+                <li><strong>innodb_data_file_path</strong> 调整数据库表空间增量</li>
+                <li><strong>innodb_buffer_pool_size</strong> 调整为内存总量的50% - 80%</li>
+                <li><strong>innodb_log_file_size</strong> 调整为<code>innodb_buffer_pool_size</code>的25%</li>
+            </ul>
+            <h3 id="26">2.6 生成授权表</h3>
+            <pre><code>/usr/local/mysql/scripts/mysql_install_db --user=mysql --basedir=/usr/local/mysql --datadir=/data/mysql
+</code></pre>
+            <h3 id="27-mysql">2.7 创建 MySQL 启动停止脚本</h3>
+            <p>你可以把MySQL加入系统启动，系统启动时自动启动MySQL服务：</p>
+            <pre><code>cp /usr/local/mysql/support-files/mysql.server  /etc/rc.d/init.d/mysql
+
+vi /etc/rc.d/init.d/mysql
+</code></pre>
+            <p>编辑MySQL启动脚本，设置basedir和datadir：</p>
+            <pre><code>basedir=/usr/local/mysql
+datadir=/data/mysql
+</code></pre>
+            <p>增加执行权限</p>
+            <pre><code>chmod 755 /etc/rc.d/init.d/mysql
+chkconfig --add mysql
+chkconfig --level 35 mysql on
+</code></pre>
+            <p>启动mysql服务</p>
+            <pre><code>service mysql start
+</code></pre>
+            <h3 id="28-mysql">2.8 MySQL安全设置</h3>
+            <p>修改密码</p>
+            <pre><code>cd /usr/local/mysql/
+/usr/local/mysql/bin/mysql_secure_installation
+</code></pre>
+            <p>登录MySQL服务器</p>
+            <pre><code>/usr/local/mysql/bin/mysql -uroot -p
+</code></pre>
+            <p>创建数据库</p>
+            <pre><code>DROP DATABASE IF EXISTS `licunchang`;
+CREATE DATABASE IF NOT EXISTS `licunchang` DEFAULT CHARACTER SET 'utf8' DEFAULT COLLATE 'utf8_general_ci';
+</code></pre>
+            <p>授权用户</p>
+            <pre><code>GRANT INSERT, DELETE, UPDATE, SELECT ON licunchang.* TO 'username'@'%' IDENTIFIED BY 'password' WITH GRANT OPTION;
+</code></pre>
+            <h3 id="29-mysql">2.9 MySQL防火墙设置</h3>
+            <p>配置防火墙，开启3306端口</p>
+            <pre><code>vi /etc/sysconfig/iptables
+</code></pre>
+            <p>把这条规则添加到默认的22端口这条规则的下面</p>
+            <pre><code>-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT
+</code></pre>
+            <p>重新启动iptables服务</p>
+            <pre><code>service iptables restart
+</code></pre>
+            <h2 id="3-php">3 PHP</h2>
+            <h3 id="31">3.1 安装依赖包</h3>
+            <pre><code>yum -y install libxml2 libjpeg freetype libpng gd curl fontconfig libxml2-devel curl-devel libjpeg-devel libpng-devel freetype-devel
+</code></pre>
+            <h3 id="32-libiconv">3.2 安装libiconv</h3>
+            <pre><code>cd /usr/local/src
+tar zxvf libiconv-1.14.tar.gz
+cd /usr/local/src/libiconv-1.14
+./configure --prefix=/usr/local/libiconv
+make
+make install
+</code></pre>
+            <h3 id="32-libmcrypt-mhash-mcrypt">3.2 安装libmcrypt &amp; mhash &amp; mcrypt</h3>
+            <pre><code>cd /usr/local/src
+tar zxvf libmcrypt-2.5.8.tar.gz
+cd /usr/local/src/libmcrypt-2.5.8
+./configure --prefix=/usr/local/libmcrypt
+make
+make install
+
+cd /usr/local/src/libmcrypt-2.5.8/libltdl
+./configure --enable-ltdl-install
+make
+make install
+
+cd /usr/local/src
+tar zxvf mhash-0.9.9.9.tar.gz
+cd /usr/local/src/mhash-0.9.9.9
+./configure --prefix=/usr/local/mhash
+make
+make install
+
+cd /usr/local/src
+tar zxvf mcrypt-2.6.8.tar.gz
+cd /usr/local/src/mcrypt-2.6.8
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/libmcrypt/lib:/usr/local/mhash/lib
+export LDFLAGS="-L/usr/local/mhash/lib/ -I/usr/local/mhash/include/"
+export CFLAGS="-I/usr/local/mhash/include/"
+./configure --prefix=/usr/local/mcrypt --with-libmcrypt-prefix=/usr/local/libmcrypt
+make
+make install
+</code></pre>
+            <h3 id="33-nginx-php-fpm">3.3 创建 nginx 及 php-fpm 运行用户及用户组</h3>
+            <pre><code>/usr/sbin/groupadd -r www
+/usr/sbin/useradd -g www -M -r -s /bin/false www
+</code></pre>
+            <h3 id="34-php">3.4 安装php</h3>
+            <pre><code>cd /usr/local/src
+tar zxvf re2c-0.13.5.tar.gz
+./configure
+make
+make install
+
+cd /usr/local/src
+tar zxvf php-5.4.17.tar.gz
+cd /usr/local/src/php-5.4.17
+./configure --prefix=/usr/local/php --with-config-file-path=/usr/local/php/etc --enable-bcmath --enable-shmop --enable-sysvsem --enable-ftp --with-curl --with-curlwrappers --with-png-dir --with-jpeg-dir --with-freetype-dir --with-gd --enable-gd-native-ttf --enable-mbstring --enable-soap --enable-sockets --enable-zip --with-xmlrpc --with-mysql=/usr/local/mysql --with-mysqli=/usr/local/mysql/bin/mysql_config --with-pdo-mysql=/usr/local/mysql/ --enable-fpm --with-fpm-user=www --with-fpm-group=www --with-zlib --with-iconv-dir=/usr/local/libiconv/ --with-pcre-dir=/usr/local/pcre --with-libxml-dir --with-mcrypt=/usr/local/libmcrypt/ --with-mhash=/usr/local/mhash/ --disable-ipv6
+make
+# make test #注意:make test可能有错
+make install
+</code></pre>
+            <h3 id="35-phpini-php-fpmconf">3.5 配置 php.ini 及 php-fpm.conf</h3>
+            <p>创建 php.ini 及 php-fpm.conf文件</p>
+            <pre><code>cp php.ini-production /usr/local/php/etc/php.ini
+rm -rf /etc/php.ini
+# ln -s /usr/local/php/etc/php.ini  /etc/php.ini
+cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf
+</code></pre>
+            <p>编辑 php-fpm.conf 文件</p>
+            <pre><code>vi /usr/local/php/etc/php-fpm.conf
+
+pid = run/php-fpm.pid
+user = www
+group = www
+
+pm = dynamic
+
+pm.max_children = 8
+pm.start_servers = 4
+pm.min_spare_servers = 1
+pm.max_spare_servers = 3
+</code></pre>
+            <p>编辑 php.ini 文件</p>
+            <pre><code>vi /usr/local/php/etc/php.ini
+
+date.timezone = Asia/Shanghai
+expose_php = Off
+</code></pre>
+            <h3 id="36-php-fpm">3.6 把 php-fpm 加入系统启动</h3>
+            <pre><code>cp /usr/local/src/php-5.4.14/sapi/fpm/init.d.php-fpm /etc/rc.d/init.d/php-fpm
+chmod 755 /etc/rc.d/init.d/php-fpm
+chkconfig --add php-fpm
+chkconfig --level 35 php-fpm on
+</code></pre>
+            <p>启动 php-fpm</p>
+            <pre><code>service php-fpm start
+</code></pre>
+            <h2 id="4-nginx">4 Nginx</h2>
+            <h3 id="41-pcre">4.1 安装 pcre</h3>
+            <pre><code>cd /usr/local/src
+tar zxvf pcre-8.32.tar.gz
+cd /usr/local/src/pcre-8.32
+./configure  --prefix=/usr/local/pcre --enable-utf --enable-pcre16 --enable-pcre32 --enable-jit --enable-unicode-properties
+make
+make install
+</code></pre>
+            <h3 id="42-nginx">4.2 安装nginx</h3>
+            <pre><code>cd /usr/local/src
+tar zxvf openssl-1.0.1e.tar.gz
+
+tar zxvf nginx-1.2.8.tar.gz
+cd /usr/local/src/nginx-1.2.8
+</code></pre>
+            <p>安全原因，你可以修改 Nginx 的服务器标识信息</p>
+            <pre><code>sed -i 's/nginx\b/Microsoft-IIS/g' ./src/core/nginx.h
+sed -i 's/1.2.8/7.5/' ./src/core/nginx.h
+sed -i 's/Server: nginx/Server: Microsoft-IIS/' ./src/http/ngx_http_header_filter_module.c
+sed -i 's/&gt;nginx&lt;/&gt;Microsoft-IIS&lt;/' ./src/http/ngx_http_special_response.c
+</code></pre>
+            <p>安装</p>
+            <pre><code>./configure --with-http_stub_status_module --with-http_gzip_static_module --with-http_ssl_module --with-openssl=/usr/local/src/openssl-1.0.1e --user=www --group=www --prefix=/usr/local/nginx --with-pcre=/usr/local/src/pcre-8.32 --with-http_realip_module --with-cpu-opt=amd64
+make
+make install
+</code></pre>
+            <h3 id="43-nginxconf">4.3 配置 nginx.conf 文件修改</h3>
+            <pre><code>vi /usr/local/nginx/conf/nginx.conf
+
+# user [user] [group]
+user  www www;
+
+# the numbers of CPU cores
+worker_processes  4;
+
+# Binds worker processes to the sets of CPUs
+worker_cpu_affinity 1000 0100 0010 0001;
+
+#error_log  logs/error.log;
+error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+pid        logs/nginx.pid;
+
+events {
+    use epoll;
+    worker_connections  1024;
+}
+
+http {
+
+    # disabled nginx version in error messages and in the "Server" response header field.
+    #server_tokens off;
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  logs/access.log  main;
+
+    # Enable the use of sendfile()
+    sendfile        on;
+    #tcp_nopush     on;
+    keepalive_timeout  65;
+
+    gzip on;
+    # Sets the minimum length of a response that will be gzipped. The length is determined only from the "Content-Length" response header field.
+    gzip_min_length  1k;
+    # Sets the [number] and [size] of buffers used to compress a response. By default, the buffer size is equal to one memory page. This is either 4K or 8K, depending on a platform.
+    gzip_buffers     4 16k;
+    gzip_http_version 1.0;
+    # Acceptable values are in the 1..9 range.
+    gzip_comp_level 2;
+    gzip_types       text/plain application/x-javascript text/css application/xml;
+    gzip_vary on;
+
+    server {
+        server_name licunchang.com;
+        rewrite ^(.*) http://www.licunchang.com$1 permanent;
+    }
+
+    # if the client didn't give a user_agent, return 412
+    if ($http_user_agent ~ ^$) {
+        return 412;
+    }
+
+    #Only allow these request methods, Do not accept DELETE, SEARCH and other methods
+    if ($request_method !~ ^(GET|HEAD|POST)$ ) {
+        return 405;
+    }
+
+    # Only requests to our Host are allowed
+    if ($host !~ ^(licunchang.com|www.licunchang.com|mysql.licunchang.com)$ ) {
+        return 444;
+    }
+
+    include /usr/local/nginx/conf/servers/*.conf;
+
+}
+</code></pre>
+            <h3 id="44-server">4.4 添加 Server</h3>
+            <pre><code>mkdir /usr/local/nginx/conf/servers/
+
+vi /usr/local/nginx/conf/servers/www.licunchang.com.conf
+
+# BEGIN ------------------------------------------- www.licunchang.com.conf
+server {
+    listen       80;
+    server_name  www.licunchang.com;
+
+    root  /data/web/www.licunchang.com;
+
+    #charset utf-8;
+
+    access_log  /usr/local/nginx/logs/www.licunchang.com.access.log  main;
+
+    location / {
+        index  index.php index.html;
+    }
+
+    error_page  404              /404.html;
+
+    # redirect server error pages to the static page /50x.html
+    #
+    error_page   500 502 503 504  /50x.html;
+
+    # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+    # location ~ \.php$ {
+    location ~ .*\.(php|do|inc|tpl)?$ {
+        if (!-f $document_root$fastcgi_script_name) {
+                return 404;
+        }
+        fastcgi_pass   127.0.0.1:9000;
+        fastcgi_index  index.php;
+        fastcgi_param  SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include        fastcgi_params;
+    }
+
+    location ~ .*\.(gif|jpg|jpeg|png|bmp|swf|js|ico|css)$ {
+        expires      360d;
+    }
+
+    location ~ /\. {
+        access_log off;
+        log_not_found off; 
+        deny all;
+    }
+}
+# END --------------------------------------------- www.licunchang.com.conf
+</code></pre>
+            <p>配置 phpmyadmin </p>
+            <pre><code>vi /usr/local/nginx/conf/servers/mysql.licunchang.com.conf
+
+# BEGIN ----------------------------------------- mysql.licunchang.com.conf
+server {
+    listen       80;
+    server_name  mysql.licunchang.com;
+
+    root  /data/web/mysql.licunchang.com;
+
+    #charset utf-8;
+
+    access_log  /usr/local/nginx/logs/mysql.licunchang.com.access.log  main;
+
+    location / {
+        # Notice: the subnet is 10.10.10.0
+        allow  10.10.10.0/24;
+        index  index.php index.html;
+    }
+
+    error_page  404              /404.html;
+
+    # redirect server error pages to the static page /50x.html
+    #
+    error_page   500 502 503 504  /50x.html;
+
+
+    # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+    # location ~ \.php$ {
+    location ~ .*\.(php|do|inc|tpl)?$ {
+        if (!-f $document_root$fastcgi_script_name) {
+                return 404;
+        }
+        fastcgi_pass   127.0.0.1:9000;
+        fastcgi_index  index.php;
+        fastcgi_param  SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include        fastcgi_params;
+    }
+
+    location ~ .*\.(gif|jpg|jpeg|png|bmp|swf|js|ico|css)$ {
+        expires      360d;
+    }
+
+    location ~ /\. {
+        access_log off;
+        log_not_found off; 
+        deny all;
+    }
+}
+# END ------------------------------------------- mysql.licunchang.com.conf
+</code></pre>
+            <p><code>mkdir -p /data/web/mysql.licunchang.com</code> 并上传 phpmyadmin 文件到 <strong>/data/web/mysql.licunchang.com</strong></p>
+            <pre><code>mkdir -p /data/web/mysql.licunchang.com
+
+cd /data/web/mysql.licunchang.com
+</code></pre>
+            <p>配置 nginx 状态监控应用</p>
+            <pre><code>vi /usr/local/nginx/conf/servers/status.licunchang.com.conf
+
+# BEGIN ------------------------------------------- status.licunchang.com.conf
+server {
+    listen  80;
+    server_name  status.licunchang.com;
+
+    location / {
+        # allow 10.10.10.0/24;
+        stub_status  on;
+        access_log  off;
+    }
+}
+# END --------------------------------------------- status.licunchang.com.conf
+
+chown www.www /data/web/mysql.licunchang.com  -R
+chmod 744 /data/web/mysql.licunchang.com  -R
+</code></pre>
+            <h3 id="45-nginx">4.5 把 nginx 加入系统启动</h3>
+            <pre><code>vi /etc/rc.d/init.d/nginx
+</code></pre>
+            <p>开机<a href="http://wiki.nginx.org/RedHatNginxInitScript">启动脚本</a>内容</p>
+            <pre><code>#!/bin/bash
+#
+# nginx - this script starts and stops the nginx daemon
+#
+# chkconfig: 35 85 15
+# description: Nginx is an HTTP and reverse proxy server, as well as a mail proxy server.
+#
+# processname: nginx
+# bin:      /usr/local/nginx/sbin/nginx
+# config:   /usr/local/nginx/conf/nginx.conf
+# pidfile:  /usr/local/nginx/logs/nginx.pid
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+# Check that networking is up.
+[ "${NETWORKING}" = "no" ] &amp;&amp; exit 6
+
+NGINX="/usr/local/nginx/sbin/nginx"
+NGINX_CONF_FILE="/usr/local/nginx/conf/nginx.conf"
+
+prog=$(basename $NGINX)
+lockfile=/var/lock/subsys/nginx
+
+# make required directories
+make_dirs() {
+    NGINX_USER=`$NGINX -V 2&gt;&amp;1 | grep "configure arguments:" | sed 's/[^*]*--user=\([^ ]*\).*/\1/g' -`
+    if [ -z "`grep $NGINX_USER /etc/passwd`" ]; then
+        if [ -z "`grep $NGINX_USER /etc/group`" ]; then
+            /usr/sbin/groupadd $NGINX_USER
+        fi
+        /usr/sbin/useradd -M -g $NGINX_USER -s /bin/false $NGINX_USER
+    fi
+    OPTIONS=`$NGINX -V 2&gt;&amp;1 | grep 'configure arguments:'`
+    for OPT in $OPTIONS; do
+        if [ `echo $OPT | grep '.*-temp-path'` ]; then
+            VALUE=`echo $OPT | cut -d "=" -f 2`
+            if [ ! -d "$VALUE" ]; then
+                # echo "creating" $value
+                mkdir -p $VALUE &amp;&amp; chown -R $NGINX_USER $VALUE
+            fi
+        fi
+    done
+}
+
+start() {
+    if [ ! -x $NGINX ]; then
+        exit 1
+    fi
+    if [ ! -f $NGINX_CONF_FILE ]; then
+        exit 6
+    fi
+
+    make_dirs
+    echo -n $"Starting $prog: "
+    daemon $NGINX -c $NGINX_CONF_FILE
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] &amp;&amp; touch $lockfile
+    return $RETVAL
+}
+
+stop() {
+    echo -n $"Stopping $prog: "
+    # QUIT:graceful shutdown
+    killproc $prog -QUIT
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] &amp;&amp; rm -f $lockfile
+    return $RETVAL
+}
+
+restart() {
+    configtest || return $?
+    stop
+    sleep 1
+    start
+}
+
+reload() {
+    configtest || return $?
+    echo -n $"Reloading $prog: "
+    # changing configuration, keeping up with a changed time zone (only for FreeBSD and Linux), 
+    # starting new worker processes with a new configuration, graceful shutdown of old worker processes
+
+    killproc $NGINX -HUP
+    RETVAL=$?
+    echo
+    return $RETVAL
+}
+
+reopen-logs() {
+    configtest || return $?
+    echo -n $"Re-opening log files: "
+    # re-opening log files
+    killproc $NGINX -USR1
+    RETVAL=$?
+    echo
+    return $RETVAL
+}
+
+configtest() {
+    $NGINX -t -c $NGINX_CONF_FILE
+}
+
+rh_status() {
+    status $prog
+}
+
+rh_status_q() {
+    rh_status &gt;/dev/null 2&gt;&amp;1
+}
+
+case "$1" in
+    start)
+        rh_status_q &amp;&amp; exit 0
+        $1
+        ;;
+    stop)
+        rh_status_q || exit 0
+        $1
+        ;;
+    restart|configtest)
+        $1
+        ;;
+    reload)
+        rh_status_q || exit 7
+        $1
+        ;;
+    reopen-logs)
+        rh_status_q || exit 7
+        $1
+        ;;
+    status)
+        rh_status
+        ;;
+    condrestart|try-restart)
+        rh_status_q || exit 0
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|reopen-logs|configtest}"
+        exit 2
+esac
+exit $?
+</code></pre>
+            <p>启动脚本权限</p>
+            <pre><code>chmod 755 /etc/rc.d/init.d/nginx
+chkconfig --add nginx 
+chkconfig --level 35 nginx on
+
+service nginx restart
+</code></pre>
+            <h3 id="46-webroot">4.6 创建 webroot 目录</h3>
+            <pre><code>mkdir -p /data/web/www.licunchang.com
+
+cd /data/web/www.licunchang.com
+
+touch favicon.ico
+
+echo "404 Not Found" &gt; 404.html
+
+echo "50x Server Error" &gt; 50x.html
+echo "500 Internal Server Error" &gt; 500.html
+echo "501 Not Implemented" &gt; 501.html
+echo "502 Bad Gateway" &gt; 502.html
+echo "503 Service Unavailable" &gt; 503.html
+echo "504 Gateway Timeout" &gt; 504.html
+echo "505 HTTP Version Not Supported" &gt; 505.html
+
+echo "&lt;?php echo phpinfo();" &gt; index.php
+
+chown www.www /data/web/www.licunchang.com  -R
+chmod 744 /data/web/www.licunchang.com  -R
+
+mkdir -p /data/web/mysql.licunchang.com
+
+cd /data/web/mysql.licunchang.com
+
+chown www.www /data/web/mysql.licunchang.com  -R
+chmod 744 /data/web/mysql.licunchang.com  -R
+</code></pre>
+            <h3 id="47-nginx">4.7 nginx 日志切割</h3>
+            <pre><code>mkdir -p /data/logs/nginx/
+mkdir -p /data/cron/
+</code></pre>
+            <p>部署 nginx 日志切割任务 <code>crontab -u root -e</code></p>
+            <pre><code>00 00 * * * /bin/bash /data/cron/nginx_logs_cut.sh
+</code></pre>
+            <p>创建脚本 <code>vi /data/cron/nginx_logs_cut.sh</code></p>
+            <pre><code>#!/bin/bash
+#description    cut nginx log files, run at 00:00 everyday
+#crontab        00 00 * * * /bin/bash /data/cron/nginx_logs_cut.sh
+#author         LiCunchang(printf@live.com)
+
+### PART 1: Move web logs to the backup directory which named by year &amp; month.
+
+LOGS_PATH=/usr/local/nginx/logs/
+APP_NAME=(www.licunchang.com mysql.licunchang.com)
+LOGS_BACKUP=/data/logs/nginx/$(date -d "yesterday" +"%Y%m")/
+
+if [ ! -d $LOGS_BACKUP ]; then
+    mkdir -p $LOGS_BACKUP
+fi
+
+APP_NUM=${#APP_NAME[@]}
+
+for ((i=0; i&lt;$APP_NUM; i++)); do
+    if [ -f ${LOGS_PATH}${APP_NAME[i]}.access.log ]; then
+        mv ${LOGS_PATH}${APP_NAME[i]}.access.log ${LOGS_BACKUP}${APP_NAME[i]}.access_$(date -d "yesterday" +"%Y%m%d%H%M%S").log
+    fi
+    if [ -f ${LOGS_PATH}${APP_NAME[i]}.error.log ]; then
+        mv ${LOGS_PATH}${APP_NAME[i]}.error.log ${LOGS_BACKUP}${APP_NAME[i]}.error_$(date -d "yesterday" +"%Y%m%d%H%M%S").log
+    fi
+done
+
+if [ -f ${LOGS_PATH}error.log ]; then
+    mv ${LOGS_PATH}error.log ${LOGS_BACKUP}error_$(date -d "yesterday" +"%Y%m%d%H%M%S").log
+fi
+
+if [ -f ${LOGS_PATH}access.log ]; then
+    mv ${LOGS_PATH}access.log ${LOGS_BACKUP}access_$(date -d "yesterday" +"%Y%m%d%H%M%S").log
+fi
+
+chmod 444 $LOGS_BACKUP  -R
+
+### PART 2: make the nginx server reopen a new log files if the nginx is running.
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+NGINX="/usr/local/nginx/sbin/nginx"
+NGINX_CONF_FILE="/usr/local/nginx/conf/nginx.conf"
+
+prog=$(basename $NGINX)
+lockfile=/var/lock/subsys/nginx
+
+reopen-logs() {
+    $NGINX -t -c $NGINX_CONF_FILE || return $?
+    echo -n $"Re-opening log files: "
+    # changing configuration, keeping up with a changed time zone (only for FreeBSD and Linux), 
+    # starting new worker processes with a new configuration, graceful shutdown of old worker processes
+    killproc $NGINX -USR1
+    RETVAL=$?
+    echo
+    return $RETVAL
+}
+
+rh_status() {
+    status $prog
+}
+
+rh_status_q() {
+    rh_status &gt;/dev/null 2&gt;&amp;1
+}
+
+# Check that networking is up.
+rh_status_q &amp;&amp; reopen-logs
+
+### PART 3: remove the old logs to free some disk space.
+
+cd $LOGS_BACKUP
+cd ..
+
+LOGS_LIFETIME_MONTHS=12
+find . -mtime +$(($LOGS_LIFETIME_MONTHS*30)) -exec rm -rf {} \;
+</code></pre>
+            <h2 id="5-memcached">5 Memcached</h2>
+            <h3 id="51-libevent">5.1 安装libevent</h3>
+            <pre><code>cd /usr/local/src
+tar zxvf libevent-2.0.21-stable.tar.gz
+cd /usr/local/src/libevent-2.0.21-stable
+./configure  --prefix=/usr/local/libevent
+make
+make install
+</code></pre>
+            <h3 id="52-memcached">5.2 安装memcached</h3>
+            <pre><code>cd /usr/local/src
+tar zxvf memcached-1.4.15.tar.gz
+cd /usr/local/src/memcached-1.4.15
+./configure  --prefix=/usr/local/memcached --with-libevent=/usr/local/libevent --enable-64bit
+make
+make install
+</code></pre>
+        </div>
+	</div>
+    <div class="clear"></div>
+    <div class="grid_8">
+        <div class="disqus">
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'licunchang';
+
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+                (function () {
+                    var s = document.createElement('script'); s.async = true;
+                    s.type = 'text/javascript';
+                    s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+                    (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+                }());
+            </script>
+            <noscript>
+            Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+            </noscript>
+            <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a> </div>
+    </div>
+    <!-- end .grid_8 -->
+    
+    <div class="grid_4">
+        <div class="weibo">
+            <iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=0&uid=1397283845&verifier=346b7a09&colors=cccccc,ffffff,112233,0B75B2,ecfbfd&dpc=1"></iframe>
+        </div>
+    </div>
+    <!-- end .grid_4 -->
+    <div class="clear"></div>
+    <div class="grid_12">
+        <div class="footer"> &copy; 2013 LiCunchang. </div>
+    </div>
+    <!-- end .grid_12 --> 
+</div>
+<!-- end .container_12 --> 
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fce63e1ea00d8911ba91774df45e565f9' type='text/javascript'%3E%3C/script%3E"));
+</script>
+</body>
+</html>
