@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans-CN">
+<head>
+<meta charset="utf-8" />
+<title>nginx rewrite 模块入门
+ - EOFException</title>
+<link rel="stylesheet" href="http://licunchang.com/css/reset.css" />
+<link rel="stylesheet" href="http://licunchang.com/css/text.css" />
+<link rel="stylesheet" href="http://licunchang.com/css/960_12_col.css" />
+<link rel="stylesheet" href="http://licunchang.com/css/demo.css" />
+<link rel="stylesheet" href="http://licunchang.com/css/markdown.css" />
+</head>
+<body>
+<div class="container_12">
+	<div class="grid_12">
+    	<div class="header">
+        	<a href="http://licunchang.com/">EOFException</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <!-- end .header -->
+    
+    <div class="grid_12">
+        <div class="nav">
+            <ul>
+                <li><a href="http://licunchang.com/">Home</a></li>
+                <li><a href="http://licunchang.com/about.html">About</a></li>
+            </ul>
+            <div class="clear"></div>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <!-- end .nav -->
+    <div class="grid_12">
+        <div class="blog">
+            <h1>nginx rewrite 模块入门
+</h1>
+            <hr />
+            <h1>1 概述</h1>
+
+<p>使用 <strong>ngx&#95;http&#95;rewrite&#95;module</strong> 模块允许正则替换URI，返回页面重定向，还可以按条件选择配置。</p>
+
+<p><strong>ngx&#95;http&#95;rewrite&#95;module</strong> 模块指令的处理顺序按照下面的执行：</p>
+
+<ol>
+<li>处理在 <code>server</code> 级别中定义的模块指令  </li>
+<li>根据请求查找 <code>location</code>  </li>
+<li>处理步骤2查找到的 <code>location</code> 中定义的模块指令。如果指令改变了 URI ，按新的 URI 查找 <code>location</code> 。这个循环至多重复10次，之后 nginx 返回错误 <strong>500 (Internal Server Error)</strong></li>
+</ol>
+
+<h2>2 指令介绍</h2>
+
+<h3>2.1 break</h3>
+
+<blockquote>
+  <p><strong>syntax:</strong>    <code>break;</code><br />
+  <strong>context:</strong>    server, location, if    </p>
+</blockquote>
+
+<p>停止处理当前这一轮的 ngx&#95;http&#95;rewrite&#95;module 指令集。例如：</p>
+
+<p>Examples 1</p>
+
+<pre><code>if ($slow) {
+    limit_rate 10k;
+    break;
+}
+</code></pre>
+
+<h3>2.2 if</h3>
+
+<blockquote>
+  <p><strong>syntax:</strong>    <code>if (condition) { ... }</code><br />
+  <strong>context:</strong>    server, location</p>
+</blockquote>
+
+<p>计算 <code>condition</code> 的值，如果为 <code>true</code> 执行定义在大括号中的 rewrite 模块指令，并将 if 指令中的配置指定给请求。if 指令会从上一层配置中继承配置。</p>
+
+<p><code>condition</code> 可以是下面的任意一种：</p>
+
+<ul>
+<li>变量名。如果变量为空或者为 <code>0</code>，则返回 <code>false</code>。<strong>注意</strong> 在 1.0.1 版本之前，以 <code>0</code> 开始的字符串也会被认为 <code>false</code>  </li>
+<li>将变量与字符串使用 <code>=</code> 和 <code>!=</code> 运算符进行比较  </li>
+<li>使用 <code>~</code> （大小写敏感）和 <code>~*</code> （大小写不敏感）运算符匹配变量与正则表达式。正则表达式可以包含匹配组，匹配结果后续可以使用变量 $1..$9 引用。也可以使用非运算符 <code>!~</code> 和 <code>!~*</code>。如果正则表达式中包含字符 <code>}</code> 或者 <code>;</code> ，整个表达式应该被包含在单引号或双引号的引用中  </li>
+<li>使用 <code>-f</code> 和 <code>!-f</code> 运算符检查文件是否存在；</li>
+<li>使用 <code>-d</code> 和 <code>!-d</code> 运算符检查目录是否存在；</li>
+<li>使用 <code>-e</code> 和 <code>!-e</code> 运算符检查文件、目录或符号链接是否存在；</li>
+<li>使用 <code>-x</code> 和 <code>!-x</code> 运算符检查可执行文件；</li>
+</ul>
+
+<p>Examples 1 如果客户端 User Agent 为 MSIE，则 rewrite到 msie 文件夹中</p>
+
+<pre><code>if ($http_user_agent ~ MSIE) {
+    rewrite ^(.*)$ /msie/$1 break;
+}
+</code></pre>
+
+<p>Examples 2 如果客户端 cookie 匹配正则，则设置 <code>$id</code> 为cookie值</p>
+
+<pre><code>if ($http_cookie ~* "id=([^;]+)(?:;|$)") {
+    set $id $1;
+}
+</code></pre>
+
+<p>Examples 3 如果客户端 request_method 为 <code>POST</code>，则返回 405</p>
+
+<pre><code>if ($request_method = POST) {
+    return 405;
+}
+</code></pre>
+
+<p>Examples 4 ??</p>
+
+<pre><code>if ($slow) {
+    limit_rate 10k;
+}
+</code></pre>
+
+<p>Examples 5 防止盗链</p>
+
+<pre><code>valid_referers none blocked server_names *.example.com;
+if ($invalid_referer) {
+    return 403;
+}
+</code></pre>
+
+<p><strong>注意</strong> nginx 是不支持 <code>if</code> 嵌套的，同时 <code>condition</code> 中不能使用多条件判断，下面的两则都是错误的。</p>
+
+<pre><code>if (condition) {
+    if (condition) {
+        # 不支持嵌套
+    }
+}
+
+if (condition_1 &amp;&amp; condition_2) {
+    # 不支持多条件判断
+}
+</code></pre>
+
+<h3>2.3 return</h3>
+
+<blockquote>
+  <p><strong>syntax:</strong>    <code>return code [text];</code> or <code>return code URL;</code> or <code>return URL;</code><br />
+  <strong>context:</strong>    server, location, if</p>
+</blockquote>
+
+<p>停止处理并返回指定 code 给客户端。返回非标准的状态码 444 可以直接关闭连接而不返回响应头。</p>
+
+<p>从 0.8.42 版开始，可以在指令中指定重定向的 URL（状态码为301、302、303和307），或者指定响应体文本（状态码为其它值）。响应体文本或重定向 URL 中可以包含变量。作为一种特殊情况，重定向 URL 可以简化为当前 server 的本地 URI，那么完整的重定向URL将按照请求协议（<code>$scheme</code>）、<code>server_name_in_redirect</code> 指令和 <code>port_in_redirect</code> 指令的配置进行补全。</p>
+
+<p>另外，状态码为 302 的临时重定向使用的 URL 可以作为指令的唯一参数。该参数应该以 <code>http://</code>、<code>https://</code> 或者 <code>https://</code> 开始。URL 中可以包含变量。</p>
+
+<blockquote>
+  <p>0.7.51 版本以前只能返回下面状态码： 204、400、402 — 406、408、410、411、413、416 和 500 — 504。</p>
+  
+  <p>直到1.1.16和1.0.13版，状态码307才被认为是一种重定向。</p>
+</blockquote>
+
+<h3>2.4 rewrite</h3>
+
+<blockquote>
+  <p><strong>syntax:</strong>    <code>rewrite regex replacement [flag];</code><br />
+  <strong>context:</strong>    server, location, if</p>
+</blockquote>
+
+<p>如果指定的正则表达式能匹配 URI，此 URI 将被 replacement 参数定义的字符串改写。rewrite 指令按其在配置文件中出现的顺序执行。flag 可以终止后续指令的执行。如果 replacement 的字符串以 <code>http://</code> 或 <code>https://</code> 开头，nginx 将结束执行过程，并返回给客户端一个重定向。</p>
+
+<p>可选的 flag 参数可以是其中之一：</p>
+
+<ul>
+<li><p><strong>last</strong></p>
+
+<p>停止执行当前这一轮的 ngx&#95;http&#95;rewrite&#95;module 指令集，然后查找匹配改变后 URI 的新 location；</p></li>
+<li><p><strong>break</strong></p>
+
+<p>停止执行当前这一轮的 ngx&#95;http&#95;rewrite&#95;module 指令集；</p></li>
+<li><p><strong>redirect</strong></p>
+
+<p>在 replacement 字符串未以 <code>http://</code> 或 <code>https://</code> 开头时，使用返回状态码为 302 的临时重定向；</p></li>
+<li><p><strong>permanent</strong></p>
+
+<p>返回状态码为 301 的永久重定向。</p></li>
+</ul>
+
+<p>完整的重定向URL将按照请求协议（$scheme）、server&#95;name&#95;in&#95;redirect 指令和 port&#95;in&#95;redirect 指令的配置进行补全。</p>
+
+<p>Example 1</p>
+
+<pre><code>server {
+    ...
+    rewrite ^(/download/.*)/media/(.*)\..*$ $1/mp3/$2.mp3 last;
+    rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  last;
+    return  403;
+    ...
+}
+</code></pre>
+
+<p>但是当上述指令写在 <code>/download/</code> 的 <code>location</code> 中时，应使用标志 <code>break</code> 代替 <code>last</code> ，否则 nginx 会重复10轮循环，然后返回错误500：</p>
+
+<pre><code>location /download/ {
+    rewrite ^(/download/.*)/media/(.*)\..*$ $1/mp3/$2.mp3 break;
+    rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  break;
+    return  403;
+}
+</code></pre>
+
+<p>如果 replacement 字符串包括新的请求参数，以往的请求参数会添加到新参数后面。如果不希望这样，在 replacement 字符串末尾加一个问号 <code>?</code>，就可以避免，比如：</p>
+
+<pre><code>rewrite ^/users/(.*)$ /show?user=$1? last;
+</code></pre>
+
+<p>如果正则表达式中包含字符 <code>}</code> 或者 <code>;</code>，整个表达式应该被包含在单引号或双引号的引用中。</p>
+
+<p>Note that outside location blocks, <code>last</code> and <code>break</code> are effectively the same.</p>
+
+<p>rewrite 不对 <strong>hostname</strong> 或者 <strong>query string</strong> 进行操作，例如：</p>
+
+<pre><code>http://www.licunchang.com/user/info?id=2000&amp;t=1361235236
+</code></pre>
+
+<p>rewrite 只能操作 <code>/user/info</code> 这一部分，也就是变量 <code>$uri</code> 的值，要对 <strong>query string</strong> 也就是变量 <code>$query_string</code> 或者 <code>$args</code> 的值进行操作可以使用 <code>$arg_PARAMETER</code> 变量，比如上面的 url ，<code>$arg_id</code> 的值就是 <code>20000</code>。</p>
+
+<pre><code>location ~* ^/user/ {
+    if ($args ~* "id=\d+$") {
+        rewrite ^ $scheme://$host/userinfo.php?id=$arg_id? permanent;
+    }
+}
+</code></pre>
+
+<p>再比如要将 /friend.php?act=friend&amp;fid=200000 重定向到 /user_info.php?act=others&amp;uid=200000 使用下面的方法。</p>
+
+<pre><code>if ($args ~* "act=friend&amp;fid=\d+$"){
+    rewrite ^/friend.php$ /user_info.php?act=others&amp;uid=$arg_fid? permanent;
+}
+</code></pre>
+
+<h3>2.5 rewrite&#95;log</h3>
+
+<blockquote>
+  <p><strong>syntax:</strong>    <code>rewrite_log on | off;</code><br />
+  <strong>default:</strong>    <code>rewrite_log off;</code><br />
+  <strong>context:</strong>    server, location, if</p>
+</blockquote>
+
+<p>开启或者关闭将 ngx&#95;http&#95;rewrite&#95;module 模块指令的处理日志以 notice 级别记录到错误日志( error&#95;log )中。</p>
+
+<h3>2.6 set</h3>
+
+<blockquote>
+  <p><strong>syntax:</strong>    <code>set variable value;</code><br />
+  <strong>context:</strong>    server, location, if</p>
+</blockquote>
+
+<p>为指定变量 variable 设置变量值 value。 value 可以包含文本、变量或者它们的组合。</p>
+
+<h3>2.7 uninitialized&#95;variable&#95;warn</h3>
+
+<blockquote>
+  <p><strong>syntax:</strong>    <code>uninitialized_variable_warn on | off;</code><br />
+  <strong>default:</strong>    <code>uninitialized_variable_warn on;</code><br />
+  <strong>context:</strong>    server, location, if</p>
+</blockquote>
+
+<p>控制是否记录变量未初始化的警告到日志。</p>
+
+<h2>3 内部实现</h2>
+
+<p>ngx&#95;http&#95;rewrite&#95;module 模块的指令在解析配置阶段被编译成 nginx 内部指令。这些内部指令在处理请求时被解释执行。而解释器是一个简单的虚拟堆栈机器（ a simple virtual stack machine）。</p>
+
+<p>比如，下面指令</p>
+
+<pre><code>location /download/ {
+    if ($forbidden) {
+        return 403;
+    }
+
+    if ($slow) {
+        limit_rate 10k;
+    }
+
+    rewrite ^/(download/.*)/media/(.*)\..*$ /$1/mp3/$2.mp3 break;
+}
+</code></pre>
+
+<p>将被翻译成下面这些指令：</p>
+
+<pre><code>variable $forbidden
+check against zero
+    return 403
+    end of code
+variable $slow
+check against zero
+match of regular expression
+copy "/"
+copy $1
+copy "/mp3/"
+copy $2
+copy ".mp3"
+end of regular expression
+end of code
+</code></pre>
+
+<p>请注意没有对应上面的 limit&#95;rate 指令的内部指令，因为这个指令与 ngx&#95;http&#95;rewrite&#95;module 模块无关。nginx 会为这个 if 块单独创建一个配置，包含 limit&#95;rate 等于10k。如果条件为真，nginx将把这个配置指派给请求。</p>
+
+<p>指令</p>
+
+<pre><code>rewrite ^/(download/.*)/media/(.*)\..*$ /$1/mp3/$2.mp3 break;
+</code></pre>
+
+<p>可以通过将正则表达式中的第一个斜线“/”放入圆括号，来实现节约一个内部指令：</p>
+
+<pre><code>rewrite ^(/download/.*)/media/(.*)\..*$ $1/mp3/$2.mp3 break;
+</code></pre>
+
+<p>对应的内部指令将会是这样：</p>
+
+<pre><code>match of regular expression
+copy $1
+copy "/mp3/"
+copy $2
+copy ".mp3"
+end of regular expression
+end of code
+</code></pre>
+
+<h2>References</h2>
+
+<ol>
+<li>Module ngx&#95;http&#95;rewrite&#95;module <a href="http://nginx.org/en/docs/http/ngx_http_rewrite_module.html" title="Module ngx_http_rewrite_module">http://nginx.org/en/docs/http/ngx&#95;http&#95;rewrite&#95;module.html</a>    </li>
+<li>ngx&#95;http&#95;rewrite&#95;module模块 <a href="http://nginx.org/cn/docs/http/ngx_http_rewrite_module.html" title="ngx_http_rewrite_module模块">http://nginx.org/cn/docs/http/ngx&#95;http&#95;rewrite&#95;module.html</a></li>
+<li>Nginx Rewrite研究笔记 <a href="http://blog.cafeneko.info/2010/10/nginx_rewrite_note/" title="Nginx Rewrite研究笔记">http://blog.cafeneko.info/2010/10/nginx&#95;rewrite&#95;note</a> </li>
+<li>HttpCoreModule <a href="http://wiki.nginx.org/HttpCoreModule" title="HttpCoreModule">http://wiki.nginx.org/HttpCoreModule</a> </li>
+</ol>
+        </div>
+	</div>
+    <div class="clear"></div>
+    <div class="grid_12">
+        <p>原创文章，转载请注明出处。</p>
+    </div>
+    <div class="clear"></div>
+    <div class="grid_12">
+        <div class="disqus">
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'licunchang';
+
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+                (function () {
+                    var s = document.createElement('script'); s.async = true;
+                    s.type = 'text/javascript';
+                    s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+                    (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+                }());
+            </script>
+            <noscript>
+            Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+            </noscript>
+            <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a> </div>
+    </div>
+    <!-- end .grid_12 -->
+    <div class="clear"></div>
+    <div class="grid_12">
+        <div class="footer"> &copy; 2013 LiCunchang. </div>
+    </div>
+    <!-- end .grid_12 --> 
+</div>
+<!-- end .container_12 --> 
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fce63e1ea00d8911ba91774df45e565f9' type='text/javascript'%3E%3C/script%3E"));
+</script>
+</body>
+</html>

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans-CN">
+<head>
+<meta charset="utf-8" />
+<title>MySQL Character Set & Collation 介绍
+ - EOFException</title>
+<link rel="stylesheet" href="http://licunchang.com/css/reset.css" />
+<link rel="stylesheet" href="http://licunchang.com/css/text.css" />
+<link rel="stylesheet" href="http://licunchang.com/css/960_12_col.css" />
+<link rel="stylesheet" href="http://licunchang.com/css/demo.css" />
+<link rel="stylesheet" href="http://licunchang.com/css/markdown.css" />
+</head>
+<body>
+<div class="container_12">
+	<div class="grid_12">
+    	<div class="header">
+        	<a href="http://licunchang.com/">EOFException</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <!-- end .header -->
+    
+    <div class="grid_12">
+        <div class="nav">
+            <ul>
+                <li><a href="http://licunchang.com/">Home</a></li>
+                <li><a href="http://licunchang.com/about.html">About</a></li>
+            </ul>
+            <div class="clear"></div>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <!-- end .nav -->
+    <div class="grid_12">
+        <div class="blog">
+            <h1>MySQL Character Set & Collation 介绍
+</h1>
+            <hr />
+            <h2>1 什么是 character set 和 collation ？</h2>
+
+<h3>1.1 Character set</h3>
+
+<blockquote>
+  <p>A <strong>character set</strong> is a set of symbols and encodings. <a href="http://dev.mysql.com/doc/refman/5.5/en/charset-general.html" title="Character Sets and Collations in General">[1]</a></p>
+</blockquote>
+
+<p>character set 是一套符号及其编码的集合。举个例子，我们有四个字母的字母表，“A”、“B”、“a”、“b”，我们把四个字母依次编码为“A” = 0, “B” = 1, “a” = 2, “b” = 3。那么，字母 <code>A</code> 就是一个符号，而数字 <code>0</code> 就是符号 <code>A</code> 的编码。然后这四个字母和和四个字母所对应的编码就是一套 character set。</p>
+
+<h3>1.2 Collation</h3>
+
+<blockquote>
+  <p>A <strong>collation</strong> is a set of rules for comparing characters in a character set. <a href="http://dev.mysql.com/doc/refman/5.5/en/charset-general.html" title="Character Sets and Collations in General">[1]</a></p>
+</blockquote>
+
+<p>Collation 就是在相应的 character set 下比较 character 的规则。在上面的 character set 中，我们要比较字母 “A” 和 “B” ，最简单的方式就是去比较两个字符的编码：“A” 对应 0 ，“B” 对应 1 ，因为 0 小于 1 ，所以我们就说 “A” 小于 “B” ，这样，我们就为上面的拥有四个字母的 character set 建立了一套比较的规则，这套规则就叫做 collation 。这种简单比较字符编码的 collation 通常我们称为 <strong>binary collation</strong> 。</p>
+
+<p>但是有时候我们比较字母的时候会忽略大小写的因素，那么基于这种考虑的比较规则就有两个步骤：1) 将比较的两个字母同时转换成相同的大写或者小写形式；2) 比较它们各自的编码。这样的比较规则就比上面单纯比较字母编码的规则要复杂一些。这是一种 <strong>case-insensitive collation(大小写不敏感 collation)</strong></p>
+
+<p>实际上，大部分的 character set 中包含许许多多的字符，甚至包括一些多字节字符或者特殊字符。与此同时，相应的 collation 也有很多的比较规则，不局限于判断字符的大小写或者编码，甚至包括字符的音调等。总而言之，存在多种多样的 character set，然后每一种 character set 有多种多样的 collation 。</p>
+
+<h3>1.3 MySQL中的 character set 和 collation</h3>
+
+<p>MySQL 包含了对多种 character set 和相应 collation 的支持，其中：</p>
+
+<ul>
+<li>可以使用多种多样的 character set 来存储数据</li>
+<li>每一种 character set 至少有一种 collation</li>
+<li>可以在同一个服务器、同一个数据库甚至同一个表中使用不同的 character set 来存储数据</li>
+<li>可以在<code>server</code>、<code>database</code>、<code>table</code>或<code>column</code>级别对 character set 进行设定</li>
+</ul>
+
+<p>我们可以通过在客户端下执行<code>SHOW CHARACTER SET</code>来查看 MySQL 所支持的 character set，下面的代码截取自一部分显示结果：</p>
+
+<pre><code>mysql&gt; SHOW CHARACTER SET;
++----------+-----------------------------+---------------------+--------+
+| Charset  | Description                 | Default collation   | Maxlen |
++----------+-----------------------------+---------------------+--------+
+| big5     | Big5 Traditional Chinese    | big5_chinese_ci     |      2 |
+| dec8     | DEC West European           | dec8_swedish_ci     |      1 |
+| cp850    | DOS West European           | cp850_general_ci    |      1 |
+……
+| eucjpms  | UJIS for Windows Japanese   | eucjpms_japanese_ci |      3 |
++----------+-----------------------------+---------------------+--------+
+39 rows in set (0.00 sec)
+</code></pre>
+
+<p>在 MySQL 中任何给定的 character set 都至少提供一种 collation ，有的 character set 甚至包含多种 collation 。使用 <code>SHOW COLLATION</code> 命令列出当前系统所提供的 collation 。</p>
+
+<pre><code>mysql&gt; SHOW COLLATION;
++--------------------------+----------+-----+---------+----------+---------+
+| Collation                | Charset  | Id  | Default | Compiled | Sortlen |
++--------------------------+----------+-----+---------+----------+---------+
+| big5_chinese_ci          | big5     |   1 | Yes     | Yes      |       1 |
+| big5_bin                 | big5     |  84 |         | Yes      |       1 |
+| dec8_swedish_ci          | dec8     |   3 | Yes     | Yes      |       1 |
+……
+| eucjpms_bin              | eucjpms  |  98 |         | Yes      |       1 |
++--------------------------+----------+-----+---------+----------+---------+
+197 rows in set (0.01 sec)
+</code></pre>
+
+<p>要列出 <strong>utf8</strong> character set 支持的 collation ，执行<code>SHOW COLLATION LIKE 'utf8_%'</code>。</p>
+
+<pre><code>mysql&gt; SHOW COLLATION LIKE 'utf8_%';
++--------------------------+---------+-----+---------+----------+---------+
+| Collation                | Charset | Id  | Default | Compiled | Sortlen |
++--------------------------+---------+-----+---------+----------+---------+
+| utf8_general_ci          | utf8    |  33 | Yes     | Yes      |       1 |
+| utf8_bin                 | utf8    |  83 |         | Yes      |       1 |
+| utf8_unicode_ci          | utf8    | 192 |         | Yes      |       8 |
+……
+| utf8mb4_sinhala_ci       | utf8mb4 | 243 |         | Yes      |       8 |
++--------------------------+---------+-----+---------+----------+---------+
+45 rows in set (0.01 sec)
+</code></pre>
+
+<p>MySQL 的 Collation 有以下特点：</p>
+
+<ul>
+<li>每一种 collation 只对应一种 character set，也就是说不同的 character set 不可能拥有相同的 collation</li>
+<li>每一种 character set 都有一个默认的 collation。在<code>SHOW COLLATION</code>命令的结果中，第四列的“Default”就是相应的 character set所对应的 collation，</li>
+<li>collation 的命名有一些规律：通常以相关联的 character set 的名字为前缀，然后中间一般是语种的名称，最后以 <strong>&#95;ci</strong> (case insensitive 大小写不敏感)， <strong>&#95;cs</strong> (case sensitive 大小写敏感)， 或者 <strong>&#95;bin</strong> (binary)结尾</li>
+</ul>
+
+<p><a href="http://collation-charts.org">Collation-Charts.ORG</a>提供了各种 collation 的更详细的说明。</p>
+
+<h2>2 MySQL中 character set 和 collation 的 level</h2>
+
+<p>MySQL中可以在 server，database，table，column 四个级别对 character set 和 collation 进行设定。甚至我们还可以单独对字符串(string literal)设定其 character set 和 collation 。</p>
+
+<h3>2.1 Server Character Set &amp; Collation</h3>
+
+<p>使用 <code>SHOW VARIABLES LIKE 'character_set_server'</code> 和 <code>SHOW VARIABLES LIKE 'collation_server'</code> 命令来查看当前系统 server 级别的 character set 和 collation 设定：</p>
+
+<pre><code>mysql&gt; SHOW VARIABLES LIKE 'character_set_server';
++----------------------+-------+
+| Variable_name        | Value |
++----------------------+-------+
+| character_set_server | utf8  |
++----------------------+-------+
+1 row in set (0.00 sec)
+mysql&gt; SHOW VARIABLES LIKE 'collation_server';
++------------------+-----------------+
+| Variable_name    | Value           |
++------------------+-----------------+
+| collation_server | utf8_general_ci |
++------------------+-----------------+
+1 row in set (0.00 sec)
+</code></pre>
+
+<p>如果要进行修改，可以在启动的时候在启动参数或者配置文件中对 server 的 character set 和 collation 进行设定。其中启动参数可以使用 <code>--character-set-server</code> 和 <code>--collation-server</code> 来设定:</p>
+
+<pre><code>shell&gt; mysqld --character-set-server=utf8 --collation-server=utf8_general_ci
+</code></pre>
+
+<p>也可以在配置文件中<code>[mysqld]</code>的段落使用 <code>character_set_server=charset</code> 和 <code>collation_server=collation</code>来设定:</p>
+
+<pre><code># my.ini(windows) or my.cnf(*nix)
+# -------------------------------------------------
+[mysqld]
+character_set_server=utf8
+collation_server=utf8_general_ci
+</code></pre>
+
+<p>二者的效果是相同的。</p>
+
+<p>server 的 character set 和 collation 的设定规则如下：</p>
+
+<ol>
+<li>如果在启动参数或者配置文件中同时指定了正确的 <code>--character-set-server</code> 和 <code>--collation-server</code> 那么系统将使用指定的 character set 和 collation</li>
+<li>只是指定了 <code>--character-set-server</code> 那么 将使用指定的 character set 默认的 collation</li>
+<li>如果没有指定 <code>--character-set-server</code> 那么 character set 和 collation 将使用默认的 character set(latin1)和 collation(latin1&#95;swedish&#95;ci)</li>
+</ol>
+
+<p><em>注意</em>：如果你想修改系统默认的 character set(latin1)和 collation(latin1<em>swedish</em>ci)，那么你必须在编译的时候指定</p>
+
+<pre><code>shell&gt; cmake . -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci
+</code></pre>
+
+<p>cmake 编译的时候和 mysqld 启动的时候都会对指定的 character set 和 collation 进行合法性检查，如果不符合要求，那么程序将报错返回停止执行。</p>
+
+<p>server 级别的 character set 和 collation 作用只是当使用 <code>CREATE DATABASE</code> 语句创建数据库没有指定 character set 和 collation 时提供一个默认值，除此之外，没有其他作用。</p>
+
+<h3>2.2 Database Character Set and Collation</h3>
+
+<p>每一个 database 都可以单独设定 character set 和 collation 。<code>CREATE DATABASE</code> 和 <code>ALTER DATABASE</code> 语句里面提供选项进行 database 的 character set 和 collation 的设定：</p>
+
+<pre><code>CREATE DATABASE db_name
+    [[DEFAULT] CHARACTER SET charset_name]
+    [[DEFAULT] COLLATE collation_name]
+
+ALTER DATABASE db_name
+    [[DEFAULT] CHARACTER SET charset_name]
+    [[DEFAULT] COLLATE collation_name]
+</code></pre>
+
+<p>这样可以单独设定每个 database 的 character set 和 collation ，在每个 database 目录下的 <strong>db.opt</strong> 文件中可以查看该 database 的 character set 和 collation 。这样就使得在同一个 server 下能存在不同 character set 和 collation 的 database。</p>
+
+<p>database 的 character set 和 collation 的设定规则如下：</p>
+
+<ol>
+<li>如果 <code>CREATE DATABASE</code> 或 <code>ALTER DATABASE</code> 同时设定了 <code>CHARACTER SET X</code> 和 <code>COLLATE Y</code>，那么 character set 就是 <strong>X</strong>， collation 就是 <strong>Y</strong></li>
+<li>如果只是设定了 <code>CHARACTER SET X</code>，那么 character set 使用 <strong>X</strong>，同时使用 <strong>X</strong> 的对应默认 collation</li>
+<li>如果只是设定了 <code>COLLATE Y</code>，collation 为 <strong>Y</strong>， 同时使用 <strong>Y</strong> 对应的 character set</li>
+<li>除以上情况，使用 server 的 character set 和 collation</li>
+</ol>
+
+<p>Database 级别的 character set 和 collation 作用是当使用 <code>CREATE TABLE</code> 没有指定 character set 时，作为 table 的默认值，除此之外， <code>LOAD DATA INFILE</code> 也使用 database 级别的 character set 和 collation。</p>
+
+<p>你可以通过 <code>SHOW VARIABLES LIKE 'character_set_database'</code> 和 <code>SHOW VARIABLES LIKE 'collation_database'</code> 命令来查看当前系统默认 database 级别的 character set 和 collation 设定，如果没有默认 database，那么这两个变量和 server 级别的 <code>character_set_server</code>、<code>collation_server</code>保持一致：</p>
+
+<pre><code>mysql&gt; SHOW VARIABLES LIKE 'character_set_database';
++------------------------+-------+
+| Variable_name          | Value |
++------------------------+-------+
+| character_set_database | utf8  |
++------------------------+-------+
+1 row in set
+mysql&gt; SHOW VARIABLES LIKE 'collation_database';
++--------------------+-----------------+
+| Variable_name      | Value           |
++--------------------+-----------------+
+| collation_database | utf8_general_ci |
++--------------------+-----------------+
+1 row in set
+</code></pre>
+
+<h3>2.3 Table Character Set &amp; Collation</h3>
+
+<p>每张表也可以设定自己的 character set 和 collation ，你可以使用 <code>CREATE TABLE</code> 或者 <code>ALTER TABLE</code> 语句来设定：</p>
+
+<pre><code>CREATE TABLE tbl_name (column_list)
+    [[DEFAULT] CHARACTER SET charset_name]
+    [COLLATE collation_name]]
+
+ALTER TABLE tbl_name
+    [[DEFAULT] CHARACTER SET charset_name]
+    [COLLATE collation_name]
+</code></pre>
+
+<p>Table 的 character set 和 collation 的设定规则如下：</p>
+
+<ol>
+<li>如果同时指定了 <code>CHARACTER SET X</code> 和 <code>COLLATE Y</code>，那么 character set 就是 <strong>X</strong> collation 就是 <strong>Y</strong></li>
+<li>如果只指定了 <code>CHARACTER SET X</code> 而没有指定 <code>COLLATE</code> ，那么使用 <strong>X</strong> 和 <strong>X</strong> 对应默认的 collation</li>
+<li>如果只指定了 <code>COLLATE Y</code> 而没有指定 <code>CHARACTER SET</code> ，那么使用 <strong>Y</strong> 和 <strong>Y</strong> 对应关联的 character set</li>
+<li>除以上情况以外，使用 database 级别的 character set 和 collation </li>
+</ol>
+
+<p>table 级别的 character set 和 collation 作用是当 column 的character set 和 collation 没有设定的时候提供默认值。table 级别的 character set 和 collation 是 MySQL 对标准 SQL 的扩展。</p>
+
+<h3>2.4 Column Character Set and Collation</h3>
+
+<p>每一个 character 类型的 column(CHAR、VARCHAR、TEXT类型等) 都可以设定 character set 和 collation ，你可以在 <code>CREATE TABLE</code> 或 <code>ALTER TABLE</code> 语句中 column 属性中进行设定：</p>
+
+<pre><code>col_name {CHAR | VARCHAR | TEXT} (col_length)
+    [CHARACTER SET charset_name]
+    [COLLATE collation_name]
+</code></pre>
+
+<p>同样的，ENUM 或者 SET 类型的 column 也能进行单独的设定：</p>
+
+<pre><code>col_name {ENUM | SET} (val_list)
+    [CHARACTER SET charset_name]
+    [COLLATE collation_name]
+</code></pre>
+
+<p>Column 的 character set 和 collation 的设定规则如下：</p>
+
+<ol>
+<li><p>如果同时指定了 <code>CHARACTER SET X</code> 和 <code>COLLATE Y</code>，那么 character set 就是 <strong>X</strong> collation 就是 <strong>Y</strong>    </p>
+
+<pre><code>CREATE TABLE t1
+(
+    col1 CHAR(10) CHARACTER SET utf8 COLLATE utf8_unicode_ci
+) CHARACTER SET latin1 COLLATE latin1_bin;
+</code></pre>
+
+<p>如上面的例子：character set 和 collation 都明确指定了， 所以 <code>col1</code> 的character set 是 <strong>utf8</strong>，collation 是 <strong>utf8&#95;unicode&#95;ci</strong></p></li>
+<li><p>如果只指定了 <code>CHARACTER SET X</code> 而没有指定 <code>COLLATE</code> ，那么使用 <strong>X</strong> 和 <strong>X</strong> 对应默认的 collation</p>
+
+<pre><code>CREATE TABLE t1
+(
+    col1 CHAR(10) CHARACTER SET utf8
+) CHARACTER SET latin1 COLLATE latin1_bin;
+</code></pre>
+
+<p>如上面的例子：只指定了 <code>col1</code> 的 character set 是 <strong>utf8</strong>，但是没有指定 <code>COLLATE</code>，则 collation 使用<strong>utf8</strong>对应的默认的 collation 为 <strong>utf8<em>general</em>ci</strong>，</p></li>
+<li><p>如果只指定了 <code>COLLATE Y</code> 而没有指定 <code>CHARACTER SET</code> ，那么使用 <strong>Y</strong> 和 <strong>Y</strong> 对应关联的 character set</p>
+
+<pre><code>CREATE TABLE t1
+(
+    col1 CHAR(10) COLLATE utf8_polish_ci
+) CHARACTER SET latin1 COLLATE latin1_bin;
+</code></pre>
+
+<p>如上面的例子：<code>col1</code> 只指定了 collation 为 <strong>utf8&#95;polish&#95;ci</strong>，没有指定 character set，则 character set 使用 <strong>utf8&#95;polish&#95;ci</strong> 对应关联的 character set 为 <strong>utf8</strong>。</p></li>
+<li><p>除以上情况，使用 table 的 character set 和 collation</p>
+
+<pre><code>CREATE TABLE t1
+(
+    col1 CHAR(10)
+) CHARACTER SET latin1 COLLATE latin1_bin;
+</code></pre>
+
+<p>如上面的例子：<code>col1</code> 的 character set 为 <strong>latin1</strong>，collation 为 <strong>latin1&#95;bin</strong></p></li>
+</ol>
+
+<p><strong>注意</strong> 如果试图使用 <code>ALTER TABLE</code> 修改 column 的 character set，如果修改前后两种 character set 不兼容，那么可能会出现数据丢失的情况。</p>
+
+<h3>2.5 Character String Literal Character Set and Collation</h3>
+
+<p>除以上以外，我们还可以对字符串（String Literal）设置 character set 和 collation。</p>
+
+<p><strong>binary string</strong>是一种没有 character set 和 collation 的由字节组成的字符，<strong>nonbinary string</strong> 是一种定义了 character set 和 collation 的字符。</p>
+
+<p>字符串可以使用 <strong>introducer</strong> 来指定 character set 同时使用 <code>COLLATE</code> 来指定 collation。</p>
+
+<pre><code>[_charset_name]'string' [COLLATE collation_name]
+</code></pre>
+
+<p>例如：</p>
+
+<pre><code>SELECT 'string';
+SELECT _latin1'string';
+SELECT _latin1'string' COLLATE latin1_danish_ci;
+</code></pre>
+
+<p>例子中的第一条，<code>SELECT 'string'</code> 中的字符串使用 <code>character_set_connection</code> 和 <code>collation_connection</code> 定义的 character set 和 collation 。</p>
+
+<p>类似于 <code>_charset_name</code> 表达方式我们叫做 <strong>introducer</strong>，它告诉解析器接下来的字符串使用 character set X 来处理，</p>
+
+<h2>Connection Character Sets and Collations</h2>
+
+<p>在一个客户端和服务器的连接中有很多的 character set 和 collation 的变量，有很多在前面的已经提到过</p>
+
+<p>还有很多其他的变量在一个客户端和服务器的交互中被使用，每一个客户端都有一个与连接相关的 character set 和 collation 系统变量，这里的连接是你连接到服务器时建立的那个东西，客户端通过连接发送 SQL 表达式，例如一个查询到服务器，服务器通过连接返回给相应给客户端，例如结果集或者错误信息，这导致了很多连接过程中的character set 和 collation的问题，这些问题都能通过一系列的系统变量来解决</p>
+
+<p>哪一种 character set 和 collation 是表达式离开客户端时使用的呢？</p>
+
+<p>服务器接到表达式之后用哪种 character set 转换  </p>
+
+<h2>See also</h2>
+
+<ul>
+<li>Character Set Support <a href="http://dev.mysql.com/doc/refman/5.5/en/charset.html" title="Character Set Support">http://dev.mysql.com/doc/refman/5.5/en/charset.html</a></li>
+<li>Collation-Charts.ORG <a href="http://collation-charts.org/" title="Collation-Charts.ORG">http://collation-charts.org/</a></li>
+</ul>
+
+<h2>References</h2>
+
+<ol>
+<li>Character Sets and Collations in General <a href="http://dev.mysql.com/doc/refman/5.5/en/charset-general.html" title="Character Sets and Collations in General">http://dev.mysql.com/doc/refman/5.5/en/charset-general.html</a>    </li>
+<li>mysql字符集与校验规则的设置, taobaodba, <a href="http://www.taobaodba.com/html/181_mysql_charset_collation_set.html" title="mysql字符集与校验规则的设置">http://www.taobaodba.com/html/181&#95;mysql&#95;charset&#95;collation&#95;set.html</a></li>
+<li>深入Mysql字符集设置, Laruence, <a href="http://www.laruence.com/2008/01/05/12.html">http://www.laruence.com/2008/01/05/12.html</a>  </li>
+<li>MySQL Data Methods, <a href="http://www.webreference.com/programming/mysql_data/4.html">http://www.webreference.com/programming/mysql_data/4.html</a></li>
+<li>String Literals, <a href="http://dev.mysql.com/doc/refman/5.5/en/string-literals.html">http://dev.mysql.com/doc/refman/5.5/en/string-literals.html</a></li>
+<li>Expression Evaluation and Type Conversion, <a href="http://82.157.70.109/mirrorbooks/mysqlguide4.1-5.0/0672326736/ch03lev1sec6.html">http://82.157.70.109/mirrorbooks/mysqlguide4.1-5.0/0672326736/ch03lev1sec6.html</a></li>
+</ol>
+        </div>
+	</div>
+    <div class="clear"></div>
+    <div class="grid_12">
+        <p>原创文章，转载请注明出处。</p>
+    </div>
+    <div class="clear"></div>
+    <div class="grid_12">
+        <div class="disqus">
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'licunchang';
+
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+                (function () {
+                    var s = document.createElement('script'); s.async = true;
+                    s.type = 'text/javascript';
+                    s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+                    (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+                }());
+            </script>
+            <noscript>
+            Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+            </noscript>
+            <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a> </div>
+    </div>
+    <!-- end .grid_12 -->
+    <div class="clear"></div>
+    <div class="grid_12">
+        <div class="footer"> &copy; 2013 LiCunchang. </div>
+    </div>
+    <!-- end .grid_12 --> 
+</div>
+<!-- end .container_12 --> 
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fce63e1ea00d8911ba91774df45e565f9' type='text/javascript'%3E%3C/script%3E"));
+</script>
+</body>
+</html>

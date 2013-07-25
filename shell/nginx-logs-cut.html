@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans-CN">
+<head>
+<meta charset="utf-8" />
+<title>Nginx 的日志切割脚本 
+ - EOFException</title>
+<link rel="stylesheet" href="http://licunchang.com/css/reset.css" />
+<link rel="stylesheet" href="http://licunchang.com/css/text.css" />
+<link rel="stylesheet" href="http://licunchang.com/css/960_12_col.css" />
+<link rel="stylesheet" href="http://licunchang.com/css/demo.css" />
+<link rel="stylesheet" href="http://licunchang.com/css/markdown.css" />
+</head>
+<body>
+<div class="container_12">
+	<div class="grid_12">
+    	<div class="header">
+        	<a href="http://licunchang.com/">EOFException</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <!-- end .header -->
+    
+    <div class="grid_12">
+        <div class="nav">
+            <ul>
+                <li><a href="http://licunchang.com/">Home</a></li>
+                <li><a href="http://licunchang.com/about.html">About</a></li>
+            </ul>
+            <div class="clear"></div>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <!-- end .nav -->
+    <div class="grid_12">
+        <div class="blog">
+            <h1>Nginx 的日志切割脚本 
+</h1>
+            <hr />
+            <pre><code>#!/bin/bash
+#
+#description    cut nginx log files, run at 00:00 everyday
+#crontab        00 00 * * * /bin/bash /data/cron/nginx_logs_cut.sh
+#author         LiCunchang(printf@live.com)
+
+### PART 1: Move web logs to the backup directory which named by year & month.
+
+readonly LOGS_PATH="/usr/local/nginx/logs/"
+readonly APP_NAME=(www.licunchang.com mysql.licunchang.com)
+readonly LOGS_BACKUP="/data/logs/nginx/$(date -d "yesterday" +"%Y%m")/"
+
+if [[ ! -d "${LOGS_BACKUP}" ]]; then
+    mkdir -p "${LOGS_BACKUP}"
+fi
+
+readonly APP_NUM=${#APP_NAME[@]}
+
+for ((i=0; i<"${APP_NUM}"; i++)); do
+    if [[ -f ${LOGS_PATH}${APP_NAME[i]}.access.log ]]; then
+        mv ${LOGS_PATH}${APP_NAME[i]}.access.log ${LOGS_BACKUP}${APP_NAME[i]}.access_$(date -d "yesterday" +"%Y%m%d%H%M%S").log
+    fi
+    if [[ -f ${LOGS_PATH}${APP_NAME[i]}.error.log ]]; then
+        mv ${LOGS_PATH}${APP_NAME[i]}.error.log ${LOGS_BACKUP}${APP_NAME[i]}.error_$(date -d "yesterday" +"%Y%m%d%H%M%S").log
+    fi
+done
+
+if [[ -f ${LOGS_PATH}error.log ]]; then
+    mv ${LOGS_PATH}error.log ${LOGS_BACKUP}error_$(date -d "yesterday" +"%Y%m%d%H%M%S").log
+fi
+
+if [[ -f ${LOGS_PATH}access.log ]]; then
+    mv ${LOGS_PATH}access.log ${LOGS_BACKUP}access_$(date -d "yesterday" +"%Y%m%d%H%M%S").log
+fi
+
+chmod 444 "${LOGS_BACKUP}"  -R
+
+### PART 2: make the nginx server reopen a new log files if the nginx is running.
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+readonly NGINX="/usr/local/nginx/sbin/nginx"
+readonly NGINX_CONF_FILE="/usr/local/nginx/conf/nginx.conf"
+readonly PROG=$(basename "$NGINX")
+
+reopen-logs() {
+    ${NGINX} -t -c ${NGINX_CONF_FILE} || return $?
+    echo -n $"Re-opening log files: "
+    # changing configuration, keeping up with a changed time zone (only for FreeBSD and Linux), 
+    # starting new worker processes with a new configuration, graceful shutdown of old worker processes
+    killproc ${NGINX} -USR1
+    retval=$?
+    echo
+    return ${retval}
+}
+
+rh_status() {
+    status ${PROG}
+}
+
+rh_status_q() {
+    rh_status >/dev/null 2>&1
+}
+
+# Check that networking is up.
+rh_status_q && reopen-logs
+
+### PART 3: remove the old logs to free some disk space.
+
+cd ${LOGS_BACKUP}
+cd ..
+
+readonly LOGS_LIFETIME_MONTHS=12
+find . -mtime +$((${LOGS_LIFETIME_MONTHS}*30)) -exec rm -rf {} \;</code></pre>        </div>
+	</div>
+    <div class="clear"></div>
+    <div class="grid_12">
+        <p>原创文章，转载请注明出处。</p>
+    </div>
+    <div class="clear"></div>
+    <div class="grid_12">
+        <div class="disqus">
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'licunchang';
+
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+                (function () {
+                    var s = document.createElement('script'); s.async = true;
+                    s.type = 'text/javascript';
+                    s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+                    (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+                }());
+            </script>
+            <noscript>
+            Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+            </noscript>
+            <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a> </div>
+    </div>
+    <!-- end .grid_12 -->
+    <div class="clear"></div>
+    <div class="grid_12">
+        <div class="footer"> &copy; 2013 LiCunchang. </div>
+    </div>
+    <!-- end .grid_12 --> 
+</div>
+<!-- end .container_12 --> 
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fce63e1ea00d8911ba91774df45e565f9' type='text/javascript'%3E%3C/script%3E"));
+</script>
+</body>
+</html>
