@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
+
+<url>
+  <loc>http://licunchang.com/</loc>
+  <lastmod>2013-07-25T08:25:44+00:00</lastmod>
+  <changefreq>always</changefreq>
+</url>
+<url>
+  <loc>http://licunchang.com/about.html</loc>
+  <lastmod>2013-07-25T08:25:44+00:00</lastmod>
+  <changefreq>always</changefreq>
+</url>
+<url>
+  <loc>http://licunchang.com/blog/nginx-log-analyzer-awstats.html</loc>
+  <lastmod>2013-07-25T08:25:44+00:00</lastmod>
+  <changefreq>always</changefreq>
+</url>
+<url>
+  <loc>http://licunchang.com/blog/centos-nginx-mysql-php-memcached.html</loc>
+  <lastmod>2013-07-25T08:25:44+00:00</lastmod>
+  <changefreq>always</changefreq>
+</url>
+<url>
+  <loc>http://licunchang.com/shell/lnmp.html</loc>
+  <lastmod>2013-07-25T08:25:44+00:00</lastmod>
+  <changefreq>always</changefreq>
+</url>
+<url>
+  <loc>http://licunchang.com/blog/mysql-user-defined-variables-example-1.html</loc>
+  <lastmod>2013-07-25T08:25:44+00:00</lastmod>
+  <changefreq>always</changefreq>
+</url>
+<url>
+  <loc>http://licunchang.com/blog/nginx-http-rewrite.html</loc>
+  <lastmod>2013-07-25T08:25:44+00:00</lastmod>
+  <changefreq>always</changefreq>
+</url>
+<url>
+  <loc>http://licunchang.com/blog/vim-textwidth-80.html</loc>
+  <lastmod>2013-07-25T08:25:44+00:00</lastmod>
+  <changefreq>always</changefreq>
+</url>
+<url>
+  <loc>http://licunchang.com/blog/php-sudoku.html</loc>
+  <lastmod>2013-07-25T08:25:44+00:00</lastmod>
+  <changefreq>always</changefreq>
+</url>
+<url>
+  <loc>http://licunchang.com/blog/mysql-character-set-collation.html</loc>
+  <lastmod>2013-07-25T08:25:44+00:00</lastmod>
+  <changefreq>always</changefreq>
+</url>
+<url>
+  <loc>http://licunchang.com/blog/sql-join.html</loc>
+  <lastmod>2013-07-25T08:25:44+00:00</lastmod>
+  <changefreq>always</changefreq>
+</url>
+<url>
+  <loc>http://licunchang.com/shell/nginx-init.html</loc>
+  <lastmod>2013-07-25T08:25:44+00:00</lastmod>
+  <changefreq>always</changefreq>
+</url>
+<url>
+  <loc>http://licunchang.com/shell/nginx-logs-cut.html</loc>
+  <lastmod>2013-07-25T08:25:44+00:00</lastmod>
+  <changefreq>always</changefreq>
+</url>
+<url>
+  <loc>http://licunchang.com/shell/lnmpex.html</loc>
+  <lastmod>2013-07-25T08:25:44+00:00</lastmod>
+  <changefreq>always</changefreq>
+</url>
+<url>
+  <loc>http://licunchang.com/shell/lamp.html</loc>
+  <lastmod>2013-07-25T08:25:44+00:00</lastmod>
+  <changefreq>always</changefreq>
+</url>
+</urlset>
