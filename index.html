@@ -33,739 +33,136 @@
     <!-- end .nav -->
     <div class="grid_8">
         <div class="list">
-            
-
-<div class="reference">
-    <div class="title">
-        <a href="http://licunchang.com/blog/centos-nginx-mysql-php-memcached.html" title="[BLOG] LNMP (Linux:CentOS6.4 + Nginx + MySQL + PHP) 安装文档
-">[BLOG] LNMP (Linux:CentOS6.4 + Nginx + MySQL + PHP) 安装文档
-</a>
-    </div>
-    <div class="abstract">
-        <h2>1 准备</h2>
-
-<h3>1.1 yum 源配置</h3>
-
-<p>如果没有可用的网络进行 yum(Yellow dog Updater, Modified)安装则需要配置本地的 yum 安装源，使用本地光盘作为 yum 源，如果有网络连接可用，则推荐使用163的 yum 源，跳过本步骤，具体详见<a href="http://mirrors.163.com/.help/centos.html">CentOS镜像使用帮助</a>。</p>
-
-<pre><code>mkdir /mnt/cdrom
-mount /dev/cdrom /mnt/cdrom
-cd /etc/yum.repos.d/
-</code></pre>
-
-<p>禁用掉系统中其他的 yum 源有两种方式：  </p>
-
-<p>1.将以 .repo 结尾的文件重命名<br />
-2.将每个配置文件中的 enabled=1 改为 enabled=0  </p>
-
-<pre><code>mv CentOS-Base.repo CentOS-Base.repo_licunchang.bak
-mv CentOS-Debuginfo.repo CentOS-Debuginfo.repo_licunchang.bak
-mv CentOS-Media.repo CentOS-Media.repo_licunchang.bak
-mv CentOS-Vault.repo CentOS-Vault.repo_licunchang.bak
-
-vi CentOS-Dvd.repo
-</code></pre>
-
-<p>文件中添加：</p>
-
-<pre><code>[c6-dvd]
-name=CentOS-$releasever - Dvd
-baseurl=file:///mnt/cdrom/
-gpgcheck=0
-enabled=1
-</code></pre>
-
-<p>重建 yum 缓存</p>
-
-<pre><code>yum makecache
-</code></pre>
-
-<h3>1.2 编译工具等安装</h3>
-
-<pre><code>yum -y install make cmake gcc gcc-c++ chkconfig automake autoconf
-</code></pre>
-
-<h3>1.3 所需源码包</h3>
-
-<ul>
-<li>nginx-1.4.2.tar.gz</li>
-<li>openssl-1.0.1e.tar.gz</li>
-<li>pcre-8.33.tar.gz</li>
-<li>mysql-5.5.32.tar.gz</li>
-<li>php-5.4.17.tar.gz</li>
-<li>libiconv-1.14.tar.gz</li>
-<li>mcrypt-2.6.8.tar.gz</li>
-<li>mhash-0.9.9.9.tar.gz</li>
-<li>libmcrypt-2.5.8.tar.gz</li>
-<li>libevent-2.0.21-stable.tar.gz</li>
-<li>memcached-1.4.15.tar.gz</li>
-<li>re2c-0.13.6.tar.gz</li>
-</ul>
-
-
-    </div>
-</div>
-<div class="reference">
-    <div class="title">
-        <a href="http://licunchang.com/blog/nginx-log-analyzer-awstats.html" title="[BLOG] nginx 日志分析工具 awstats 使用简介
-">[BLOG] nginx 日志分析工具 awstats 使用简介
-</a>
-    </div>
-    <div class="abstract">
-        <p>下载之后详细的文档在 &#95;path-awstats-[vsersion]&#95;/docs/ 中存在，能够阅读英文的话可以直接参考官方文档。</p>
-
-<h2>1 Installation</h2>
-
-<p><strong>下载地址</strong> http://sourceforge.net/projects/awstats/</p>
-
-<pre><code>cd /usr/local/src
-tar zxf /usr/local/src/awstats-7.1.1.tar.gz
-mkdir -p /usr/local/awstats/
-cp -R /usr/local/src/awstats-7.1.1/* /usr/local/awstats/
-
-yum install perl
-</code></pre>
-
-<h2>2 Configuration</h2>
-
-<p>awstats_configure.pl 文件能自动帮你生成配置文件，同时将配置文件放在 /etc/awstats/ 目录下。</p>
-
-<pre><code>cd /usr/local/awstats/
-perl /usr/local/awstats/tools/awstats_configure.pl
-</code></pre>
-
-<p>按照提示，输入相关的信息，对于 nginx 而言，提示</p>
-
-<blockquote>
-  <p>Config file path ('none' to skip web server setup):</p>
-</blockquote>
-
-<p>时输入 <code>none</code>，输入 <code>y</code> 创建一个新的配置文件，输入你的应用名称 <em>website</em>，默认存放地址为 /etc/awstats，这样就在 /etc/awstats/目录下生成了一个相应的配置文件awstats.<em>website</em>.conf。</p>
-
-<p>编辑配置文件 /etc/awstats/awstats.<em>website</em>.conf</p>
-
-<pre><code>vi /etc/awstats/awstats.www.licunchang.com.conf
-</code></pre>
-
-<p>修改以下配置</p>
-
-<pre><code>LogFile="/data/logs/nginx/%YYYY-24%MM-24/www.licunchang.com.access_%YYYY-24%MM-24%DD-24*.log"
-LogType = W
-LogFormat = "%host - %host_r %time1 %methodurl %code %bytesd %refererquot %uaquot %otherquot"
-LogSeparator=" "
-SiteDomain="www.licunchang.com"
-DirData="/data/awstats"
-LoadPlugin="decodeutfkeys"
-DNSLookup=0
-</code></pre>
-
-
-    </div>
-</div>
-<div class="reference">
-    <div class="title">
-        <a href="http://licunchang.com/shell/lnmp.html" title="[SHELL] LNMP (Linux:CentOS6.4 + Nginx + MySQL + PHP) 安装脚本
-">[SHELL] LNMP (Linux:CentOS6.4 + Nginx + MySQL + PHP) 安装脚本
-</a>
-    </div>
-    <div class="abstract">
-        <pre><code>#!/bin/bash
-#
-# description    Install nginx1.4.1 & mysql5.5.31 & php5.4.15 on CentOS6.4
-# author         LiCunchang(printf@live.com)
-# version        2.0.20130602
-
-################################################################################
-# Put error messages to STDERR.
-# Globals:
-#   None
-# Arguments:
-#   String
-# Returns:
-#   None
-################################################################################
-logger::error() {
-    # `date --iso-8601=ns`
-    echo "[error:$(date +'%Y-%m-%dT%H:%M:%S%z')]: $@" >&2
-    exit 1
-}
-
-################################################################################
-# echo info messages.
-# Globals:
-#   None
-# Arguments:
-#   String
-# Returns:
-#   None
-################################################################################
-logger::info() {
-    echo "[info:$(date +'%Y-%m-%dT%H:%M:%S%z')]: $@" >&2
-}
-
-################################################################################
-# Trap the error message.
-# Globals:
-#   None
-# Arguments:
-</code></pre>
-    </div>
-</div>
-<div class="reference">
-    <div class="title">
-        <a href="http://licunchang.com/blog/mysql-user-defined-variables-example-1.html" title="[BLOG] MySQL 用户自定义变量示例一则
-">[BLOG] MySQL 用户自定义变量示例一则
-</a>
-    </div>
-    <div class="abstract">
-        <p>下面是示例库</p>
-
-<pre><code>CREATE TABLE `users`
-(
-    `uid`       MEDIUMINT UNSIGNED AUTO_INCREMENT COMMENT '用户ud',
-    `username`  CHAR(20) NOT NULL DEFAULT '' COMMENT '用户名',
-    `point`     INT UNSIGNED NOT NULL DEFAULT '0' COMMENT '用户积分',
-                PRIMARY KEY(`uid`)
-)
-ENGINE=InnoDB COMMENT='用户表' DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;
-
-INSERT INTO `users`(`uid`, `username`, `point`) VALUES ('1', 'admin', '1000');
-
-CREATE TABLE `records`
-(
-    `rid`       MEDIUMINT UNSIGNED AUTO_INCREMENT COMMENT '记录id',
-    `type`      TINYINT UNSIGNED NOT NULL DEFAULT '0' COMMENT '类型(1:收入;2:消费)',
-    `amount`    INT UNSIGNED NOT NULL DEFAULT '0' COMMENT '消费积分',
-    `balance`   INT UNSIGNED NOT NULL DEFAULT '0' COMMENT '账户余额',
-                PRIMARY KEY(`rid`)
-)
-ENGINE=InnoDB COMMENT='积分记录表' DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;
-</code></pre>
-
-<p>上面的是一个很常见的用户信息表和积分记录表，用户有积分属性，积分有 <strong>收入</strong> 和 <strong>消费</strong> 两种状态，而 <code>records</code> 表记录了用户积分的变动历史。</p>
-
-
-    </div>
-</div>
-<div class="reference">
-    <div class="title">
-        <a href="http://licunchang.com/blog/nginx-http-rewrite.html" title="[BLOG] nginx rewrite 模块入门
-">[BLOG] nginx rewrite 模块入门
-</a>
-    </div>
-    <div class="abstract">
-        <h1>1 概述</h1>
-
-<p>使用 <strong>ngx&#95;http&#95;rewrite&#95;module</strong> 模块允许正则替换URI，返回页面重定向，还可以按条件选择配置。</p>
-
-<p><strong>ngx&#95;http&#95;rewrite&#95;module</strong> 模块指令的处理顺序按照下面的执行：</p>
-
-<ol>
-<li>处理在 <code>server</code> 级别中定义的模块指令  </li>
-<li>根据请求查找 <code>location</code>  </li>
-<li>处理步骤2查找到的 <code>location</code> 中定义的模块指令。如果指令改变了 URI ，按新的 URI 查找 <code>location</code> 。这个循环至多重复10次，之后 nginx 返回错误 <strong>500 (Internal Server Error)</strong></li>
-</ol>
-
-<h2>2 指令介绍</h2>
-
-<h3>2.1 break</h3>
-
-<blockquote>
-  <p><strong>syntax:</strong>    <code>break;</code><br />
-  <strong>context:</strong>    server, location, if    </p>
-</blockquote>
-
-<p>停止处理当前这一轮的 ngx&#95;http&#95;rewrite&#95;module 指令集。例如：</p>
-
-<p>Examples 1</p>
-
-<pre><code>if ($slow) {
-    limit_rate 10k;
-    break;
-}
-</code></pre>
-
-<h3>2.2 if</h3>
-
-<blockquote>
-  <p><strong>syntax:</strong>    <code>if (condition) { ... }</code><br />
-  <strong>context:</strong>    server, location</p>
-</blockquote>
-
-<p>计算 <code>condition</code> 的值，如果为 <code>true</code> 执行定义在大括号中的 rewrite 模块指令，并将 if 指令中的配置指定给请求。if 指令会从上一层配置中继承配置。</p>
-
-
-    </div>
-</div>
-<div class="reference">
-    <div class="title">
-        <a href="http://licunchang.com/blog/vim-textwidth-80.html" title="[BLOG] Vim 字行宽度 80 设置
-">[BLOG] Vim 字行宽度 80 设置
-</a>
-    </div>
-    <div class="abstract">
-        
-    </div>
-</div>
-<div class="reference">
-    <div class="title">
-        <a href="http://licunchang.com/blog/php-sudoku.html" title="[BLOG] PHP 递归计算所谓“世界最难数独游戏”
-">[BLOG] PHP 递归计算所谓“世界最难数独游戏”
-</a>
-    </div>
-    <div class="abstract">
-        <p>闲，写个程序递归一下新闻中"世界最难数独游戏"。</p>
-
-<pre><code>8    0    0    0    0    0    0    0    0    
-
-0    0    3    6    0    0    0    0    0    
-
-0    7    0    0    9    0    2    0    0    
-
-0    5    0    0    0    7    0    0    0    
-
-0    0    0    0    4    5    7    0    0    
-
-0    0    0    1    0    0    0    3    0    
-
-0    0    1    0    0    0    0    6    8    
-
-0    0    8    5    0    0    0    1    0    
-
-0    9    0    0    0    0    4    0    0    
-</code></pre>
-
-<p>上代码</p>
-
-<pre><code>&lt;?php
-
-/**
- * 输出数独
- */
-function output($sudoku){
-    foreach ($sudoku as $key_row =&gt; $col) {
-        foreach ($col as $key_col =&gt; $value_col) {
-            echo $value_col . "&amp;nbsp;&amp;nbsp;&amp;nbsp;";
-        }
-        echo "&lt;br/&gt;&lt;br/&gt;";
-    }
-}
-
-/**
- * 初始化数独
- */
-function init(&amp; $sudoku){
-
-    for($row = 1; $row &lt;= 9; $row++) {
-        for($col = 1; $col &lt;= 9; $col++) {
-            $sudoku[$row][$col] = 0;
-        }
-    }
-
-    $sudoku['1']['1'] = 8;
-    $sudoku['2']['3'] = 3;
-    $sudoku['2']['4'] = 6;
-    $sudoku['3']['2'] = 7;
-    $sudoku['3']['5'] = 9;
-    $sudoku['3']['7'] = 2;
-    $sudoku['4']['2'] = 5;
-    $sudoku['4']['6'] = 7;
-    $sudoku['5']['5'] = 4;
-    $sudoku['5']['6'] = 5;
-    $sudoku['5']['7'] = 7;
-    $sudoku['6']['4'] = 1;
-    $sudoku['6']['8'] = 3;
-    $sudoku['7']['3'] = 1;
-    $sudoku['7']['8'] = 6;
-    $sudoku['7']['9'] = 8;
-    $sudoku['8']['3'] = 8;
-    $sudoku['8']['4'] = 5;
-    $sudoku['8']['8'] = 1;
-    $sudoku['9']['2'] = 9;
-    $sudoku['9']['7'] = 4;
-}
-
-/**
- * 根据给出的行列编号给出可用的数字
- */
-function advise($sudoku, $row, $col, $row_p, $col_p){
-
-    if($sudoku[$row][$col] != 0){
-        return array($sudoku[$row][$col]);
-    }
-    $temp = array(
-            1 =&gt; 0,
-            2 =&gt; 0,
-            3 =&gt; 0,
-            4 =&gt; 0,
-            5 =&gt; 0,
-            6 =&gt; 0,
-            7 =&gt; 0,
-            8 =&gt; 0,
-            9 =&gt; 0,
-        );
-
-    for($i=1; $i &lt;= 9; $i++) { 
-        if(array_key_exists($sudoku[$row][$i], $temp) 
-            &amp;&amp; isset($temp[($sudoku[$row][$i])])){
-            unset($temp[($sudoku[$row][$i])]);
-        }
-    }
-    for($i=1; $i &lt;= 9; $i++) { 
-        if(array_key_exists($sudoku[$i][$col], $temp) 
-            &amp;&amp; isset($temp[($sudoku[$i][$col])])){
-            unset($temp[($sudoku[$i][$col])]);
-        }
-    }
-
-    $row_stt = (($row_p - 1) * 3 + 1);
-    $row_end = ($row_p * 3);
-
-    $col_stt = (($col_p - 1) * 3 + 1);
-    $col_end = ($col_p * 3);
-
-    for($i = $row_stt; $i &lt;= $row_end; $i++) { 
-        for($j = $col_stt; $j &lt;= $col_end; $j++) { 
-            if(array_key_exists($sudoku[$i][$j], $temp) 
-                &amp;&amp; isset($temp[($sudoku[$i][$j])])){
-                unset($temp[($sudoku[$i][$j])]);
-            }
-        }
-    }
-    return array_keys($temp);
-}
-
-function sudoku($sudoku, $row = 1, $col = 1){
-
-    $row_p = ceil($row / 3);
-    $col_p = ceil($col / 3);
-
-    $available_numbers = advise($sudoku, $row, $col, $row_p, $col_p);
-
-    if(empty($available_numbers)){
-        return false;
-    }
-    else{
-
-        $col_next = $col;
-        $row_next = $row + 1;
-        if($row_next &gt; 9){
-            $row_next = 1;
-            $col_next = $col + 1;
-        }
-
-        foreach ($available_numbers as $value) {
-            $sudoku[$row][$col] = $value;
-
-            if ($row == 9 &amp;&amp; $col == 9) {
-                output($sudoku);
-                return true;
-            }
-            if(sudoku($sudoku, $row_next, $col_next)){
-                return true;
-            }
-        }
-        return false;
-    }
-}
-
-function shutdown_func(){
-    echo microtime(true)."&lt;br/&gt;";
-    echo memory_get_usage();
-}
-
-ini_set('max_input_nesting_level', '9999999');
-ini_set('max_execution_time', '9999999'); 
-ini_set('xdebug.max_nesting_level', '9999999');
-
-$sudoku = array();
-
-echo microtime(true)."&lt;br/&gt;&lt;br/&gt;";
-
-init($sudoku);
-
-sudoku($sudoku);
-
-register_shutdown_function("shutdown_func"); 
-</code></pre>
-
-
-    </div>
-</div>
-<div class="reference">
-    <div class="title">
-        <a href="http://licunchang.com/blog/mysql-character-set-collation.html" title="[BLOG] MySQL Character Set & Collation 介绍
-">[BLOG] MySQL Character Set & Collation 介绍
-</a>
-    </div>
-    <div class="abstract">
-        <h2>1 什么是 character set 和 collation ？</h2>
-
-<h3>1.1 Character set</h3>
-
-<blockquote>
-  <p>A <strong>character set</strong> is a set of symbols and encodings. <a href="http://dev.mysql.com/doc/refman/5.5/en/charset-general.html" title="Character Sets and Collations in General">[1]</a></p>
-</blockquote>
-
-<p>character set 是一套符号及其编码的集合。举个例子，我们有四个字母的字母表，“A”、“B”、“a”、“b”，我们把四个字母依次编码为“A” = 0, “B” = 1, “a” = 2, “b” = 3。那么，字母 <code>A</code> 就是一个符号，而数字 <code>0</code> 就是符号 <code>A</code> 的编码。然后这四个字母和和四个字母所对应的编码就是一套 character set。</p>
-
-<h3>1.2 Collation</h3>
-
-<blockquote>
-  <p>A <strong>collation</strong> is a set of rules for comparing characters in a character set. <a href="http://dev.mysql.com/doc/refman/5.5/en/charset-general.html" title="Character Sets and Collations in General">[1]</a></p>
-</blockquote>
-
-<p>Collation 就是在相应的 character set 下比较 character 的规则。在上面的 character set 中，我们要比较字母 “A” 和 “B” ，最简单的方式就是去比较两个字符的编码：“A” 对应 0 ，“B” 对应 1 ，因为 0 小于 1 ，所以我们就说 “A” 小于 “B” ，这样，我们就为上面的拥有四个字母的 character set 建立了一套比较的规则，这套规则就叫做 collation 。这种简单比较字符编码的 collation 通常我们称为 <strong>binary collation</strong> 。</p>
-
-
-    </div>
-</div>
-<div class="reference">
-    <div class="title">
-        <a href="http://licunchang.com/blog/sql-join.html" title="[BLOG] SQL 中的 join 语法
-">[BLOG] SQL 中的 join 语法
-</a>
-    </div>
-    <div class="abstract">
-        <p>有两张表: <strong>department</strong> 和 <strong>employee</strong>，数据结构和数据如下：</p>
-
-<p><strong>department</strong></p>
-
-<pre><code>SQL&gt; SELECT * FROM department
-
- department_id | department_name 
----------------+-----------------
-             1 | Sales
-             2 | Marketing
-             3 | Engineering
-             4 | Clerical
-(4 行记录)
-</code></pre>
-
-<p><strong>employee</strong></p>
-
-<pre><code>SQL&gt; SELECT * FROM employee
-
- department_id | employee_name
----------------+---------------
-             1 | Rafferty
-             3 | Jones
-             3 | Steinberg
-             4 | Robinson
-             4 | Smith
-        [NULL] | John
-(6 行记录)
-</code></pre>
-
-<p>PostgreSQL 代码(MySQL 对某些 SQL 语法不支持)如下：</p>
-
-<pre><code>CREATE TABLE department(
-    department_id    SMALLINT,
-    department_name  VARCHAR(20)
-);
-
-CREATE TABLE employee(
-    department_id    SMALLINT,
-    employee_name    VARCHAR(20)
-);
-
-INSERT INTO department VALUES('1', 'Sales');
-INSERT INTO department VALUES('2', 'Marketing');
-INSERT INTO department VALUES('3', 'Engineering');
-INSERT INTO department VALUES('4', 'Clerical');
-
-INSERT INTO employee VALUES('1', 'Rafferty');
-INSERT INTO employee VALUES('3', 'Jones');
-INSERT INTO employee VALUES('3', 'Steinberg');
-INSERT INTO employee VALUES('4', 'Robinson');
-INSERT INTO employee VALUES('4', 'Smith');
-INSERT INTO employee VALUES(NULL, 'John');
-</code></pre>
-
-<h2>1 内连接(inner join)</h2>
-
-
-    </div>
-</div>
-<div class="reference">
-    <div class="title">
-        <a href="http://licunchang.com/shell/nginx-init.html" title="[SHELL] Nginx 的启停脚本 /etc/init.d/nginx 
-">[SHELL] Nginx 的启停脚本 /etc/init.d/nginx 
-</a>
-    </div>
-    <div class="abstract">
-        <pre><code>#!/bin/bash
-#
-# nginx    Start/Stop the cron clock daemon.
-#
-# chkconfig: 35 85 15
-# description: Nginx is an HTTP and reverse proxy server, as well as a mail proxy server.
-#
-# processname: nginx
-# bin:      /usr/local/nginx/sbin/nginx
-# config:   /usr/local/nginx/conf/nginx.conf
-# pidfile:  /usr/local/nginx/logs/nginx.pid
-
-################################################################################
-# Make required directories | user | group .
-# Globals:
-#   NGINX_SBIN_FILE
-# Arguments:
-#   None
-# Returns:
-#   None
-################################################################################
-prepare() {
-
-    local options="$(${NGINX_SBIN_FILE} -V 2>&1 | grep 'configure arguments:')"
-
-    local nginx_user="$(echo ${options} | sed 's/[^*]*--user=\([^ ]*\).*/\1/g')"
-    local nginx_group="$(echo ${options} | sed 's/[^*]*--group=\([^ ]*\).*/\1/g')"
-
-    local group=$(grep "^${nginx_group}" /etc/group | awk -F: '{print $1}')
-    local user=$(grep "^${nginx_user}" /etc/passwd | awk -F: '{print $1}')
-</code></pre>
-    </div>
-</div>
-<div class="reference">
-    <div class="title">
-        <a href="http://licunchang.com/shell/nginx-logs-cut.html" title="[SHELL] Nginx 的日志切割脚本 
-">[SHELL] Nginx 的日志切割脚本 
-</a>
-    </div>
-    <div class="abstract">
-        <pre><code>#!/bin/bash
-#
-#description    cut nginx log files, run at 00:00 everyday
-#crontab        00 00 * * * /bin/bash /data/cron/nginx_logs_cut.sh
-#author         LiCunchang(printf@live.com)
-
-### PART 1: Move web logs to the backup directory which named by year & month.
-
-readonly LOGS_PATH="/usr/local/nginx/logs/"
-readonly APP_NAME=(www.licunchang.com mysql.licunchang.com)
-readonly LOGS_BACKUP="/data/logs/nginx/$(date -d "yesterday" +"%Y%m")/"
-
-if [[ ! -d "${LOGS_BACKUP}" ]]; then
-    mkdir -p "${LOGS_BACKUP}"
-fi
-
-readonly APP_NUM=${#APP_NAME[@]}
-
-for ((i=0; i<"${APP_NUM}"; i++)); do
-    if [[ -f ${LOGS_PATH}${APP_NAME[i]}.access.log ]]; then
-        mv ${LOGS_PATH}${APP_NAME[i]}.access.log ${LOGS_BACKUP}${APP_NAME[i]}.access_$(date -d "yesterday" +"%Y%m%d%H%M%S").log
-    fi
-    if [[ -f ${LOGS_PATH}${APP_NAME[i]}.error.log ]]; then
-        mv ${LOGS_PATH}${APP_NAME[i]}.error.log ${LOGS_BACKUP}${APP_NAME[i]}.error_$(date -d "yesterday" +"%Y%m%d%H%M%S").log
-    fi
-done
-</code></pre>
-    </div>
-</div>
-<div class="reference">
-    <div class="title">
-        <a href="http://licunchang.com/shell/lnmpex.html" title="[SHELL] CentOS 下安装 xtrabackup & memcached & redis & varnish & tcpdump 等
-">[SHELL] CentOS 下安装 xtrabackup & memcached & redis & varnish & tcpdump 等
-</a>
-    </div>
-    <div class="abstract">
-        <pre><code>#!/bin/bash
-# description    xtrabackup & memcached & redis & varnish & mongodb
-# author         LiCunchang
-
-# 1 percona-xtrabackup-2.0.5.tar.gz (mysql-5.5.17.tar.gz)
-# 2 memcached-1.4.15.tar.gz (libevent-2.0.21-stable.tar.gz)
-# 3 redis-2.6.11.tar.gz
-# 4 varnish-3.0.3.tar.gz
-# 5 mongodb-src-r2.4.1.tar.gz
-# 6 tcpdump-4.3.0.tar.gz (libpcap-1.3.0.tar.gz)
-
-# source directory: /usr/local/src
-
-prepare() {
-
-    # Source networking configuration.
-    . /etc/sysconfig/network
-    
-    # Check that networking is up.
-    if [ "$NETWORKING" = "no" ]; then
-        echo "network is not available."
-        exit 1
-    else
-        echo "network is working."
-    fi
-
-    # Create yum repository from cdrom media
-    echo "create yum repository from cdrom media."
-    cdrom_mount_dir="/mnt/cdrom"
-    if [ ! -d "$cdrom_mount_dir" ]; then
-        mkdir $cdrom_mount_dir
-        exit_value=$?
-        if [ $exit_value -gt 0 ]; then
-            echo "can't create a directory as a mount point"
-        fi
-    fi
-
-    if [ -z "`ls -A "$cdrom_mount_dir"`" ]; then
-</code></pre>
-    </div>
-</div>
-<div class="reference">
-    <div class="title">
-        <a href="http://licunchang.com/shell/lamp.html" title="[SHELL] LAMP (Linux:CentOS6.4 + Apache + MySQL + PHP) 安装脚本
-">[SHELL] LAMP (Linux:CentOS6.4 + Apache + MySQL + PHP) 安装脚本
-</a>
-    </div>
-    <div class="abstract">
-        <pre><code>#!/bin/bash
-# description    Install httpd2.2.24 & mysql5.5.30 & php5.4.12 on CentOS6.4
-# author         LiCunchang
-
-# 1 httpd-2.2.24.tar.gz
-# 2 libmcrypt-2.5.8.tar.gz
-# 3 pcre-8.32.tar.gz
-# 4 mysql-5.5.30.tar.gz
-# 5 php-5.4.12.tar.gz
-# 6 libiconv-1.14.tar.gz
-# 7 mcrypt-2.6.8.tar.gz
-# 8 mhash-0.9.9.9.tar.gz
-
-# source directory: /usr/local/src
-
-#   /data
-#       |-/web
-#           |-/www.licunchang.com
-#           |-/mysql.licunchang.com
-#           |-......
-#       |-/mysql
-#       |-/logs
-#           |-/httpd
-#       |-/backup
-#           |-/mysql
-#           |-/app
-#       |-/cron
-
-# Source networking configuration.
-. /etc/sysconfig/network
-
-# Check that networking is up.
-if [ "$NETWORKING" = "no" ]; then
-    echo "network is not available."
-    exit 1
-else
-    echo "network is working."
-fi
-
-# Create yum repository from cdrom media
-echo "create yum repository from cdrom media."
-cdrom_mount_dir="/mnt/cdrom"
-if [ ! -d "$cdrom_mount_dir" ]; then
-    mkdir $cdrom_mount_dir
-    exit_value=$?
-</code></pre>
-    </div>
-</div>
+            <div class="reference">
+                <div class="title">
+                    <a href="http://licunchang.com/blog/centos-nginx-mysql-php-memcached.html" title="[BLOG] LNMP (Linux:CentOS6.4 + Nginx + MySQL + PHP) 安装文档
+            ">[BLOG] LNMP (Linux:CentOS6.4 + Nginx + MySQL + PHP) 安装文档
+            </a>
+                </div>
+                <div class="abstract">
+                    
+                </div>
+            </div>
+            <div class="reference">
+                <div class="title">
+                    <a href="http://licunchang.com/blog/nginx-log-analyzer-awstats.html" title="[BLOG] nginx 日志分析工具 awstats 使用简介
+            ">[BLOG] nginx 日志分析工具 awstats 使用简介
+            </a>
+                </div>
+                <div class="abstract">
+                    
+                </div>
+            </div>
+            <div class="reference">
+                <div class="title">
+                    <a href="http://licunchang.com/shell/lnmp.html" title="[SHELL] LNMP (Linux:CentOS6.4 + Nginx + MySQL + PHP) 安装脚本
+            ">[SHELL] LNMP (Linux:CentOS6.4 + Nginx + MySQL + PHP) 安装脚本
+            </a>
+                </div>
+                <div class="abstract">
+                    
+                </div>
+            </div>
+            <div class="reference">
+                <div class="title">
+                    <a href="http://licunchang.com/blog/mysql-user-defined-variables-example-1.html" title="[BLOG] MySQL 用户自定义变量示例一则
+            ">[BLOG] MySQL 用户自定义变量示例一则
+            </a>
+                </div>
+                <div class="abstract">
+                    
+                </div>
+            </div>
+            <div class="reference">
+                <div class="title">
+                    <a href="http://licunchang.com/blog/nginx-http-rewrite.html" title="[BLOG] nginx rewrite 模块入门
+            ">[BLOG] nginx rewrite 模块入门
+            </a>
+                </div>
+                <div class="abstract">
+                    
+                </div>
+            </div>
+            <div class="reference">
+                <div class="title">
+                    <a href="http://licunchang.com/blog/vim-textwidth-80.html" title="[BLOG] Vim 字行宽度 80 设置
+            ">[BLOG] Vim 字行宽度 80 设置
+            </a>
+                </div>
+                <div class="abstract">
+                    
+                </div>
+            </div>
+            <div class="reference">
+                <div class="title">
+                    <a href="http://licunchang.com/blog/php-sudoku.html" title="[BLOG] PHP 递归计算所谓“世界最难数独游戏”
+            ">[BLOG] PHP 递归计算所谓“世界最难数独游戏”
+            </a>
+                </div>
+                <div class="abstract">
+                    
+                </div>
+            </div>
+            <div class="reference">
+                <div class="title">
+                    <a href="http://licunchang.com/blog/mysql-character-set-collation.html" title="[BLOG] MySQL Character Set & Collation 介绍
+            ">[BLOG] MySQL Character Set & Collation 介绍
+            </a>
+                </div>
+                <div class="abstract">
+                    
+                </div>
+            </div>
+            <div class="reference">
+                <div class="title">
+                    <a href="http://licunchang.com/blog/sql-join.html" title="[BLOG] SQL 中的 join 语法
+            ">[BLOG] SQL 中的 join 语法
+            </a>
+                </div>
+                <div class="abstract">
+                    
+                </div>
+            </div>
+            <div class="reference">
+                <div class="title">
+                    <a href="http://licunchang.com/shell/nginx-init.html" title="[SHELL] Nginx 的启停脚本 /etc/init.d/nginx 
+            ">[SHELL] Nginx 的启停脚本 /etc/init.d/nginx 
+            </a>
+                </div>
+                <div class="abstract">
+                    
+                </div>
+            </div>
+            <div class="reference">
+                <div class="title">
+                    <a href="http://licunchang.com/shell/nginx-logs-cut.html" title="[SHELL] Nginx 的日志切割脚本 
+            ">[SHELL] Nginx 的日志切割脚本 
+            </a>
+                </div>
+                <div class="abstract">
+                    
+                </div>
+            </div>
+            <div class="reference">
+                <div class="title">
+                    <a href="http://licunchang.com/shell/lnmpex.html" title="[SHELL] CentOS 下安装 xtrabackup & memcached & redis & varnish & tcpdump 等
+            ">[SHELL] CentOS 下安装 xtrabackup & memcached & redis & varnish & tcpdump 等
+            </a>
+                </div>
+                <div class="abstract">
+                    
+                </div>
+            </div>
+            <div class="reference">
+                <div class="title">
+                    <a href="http://licunchang.com/shell/lamp.html" title="[SHELL] LAMP (Linux:CentOS6.4 + Apache + MySQL + PHP) 安装脚本
+            ">[SHELL] LAMP (Linux:CentOS6.4 + Apache + MySQL + PHP) 安装脚本
+            </a>
+                </div>
+                <div class="abstract">
+                    
+                </div>
+            </div>
         </div>
         <div class="multipage hidden">
         	<div class="page"><a href="javascript:void(0);">首页</a></div>
