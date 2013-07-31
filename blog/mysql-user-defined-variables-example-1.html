@@ -61,8 +61,7 @@ CREATE TABLE `records`
     `balance`   INT UNSIGNED NOT NULL DEFAULT '0' COMMENT '账户余额',
                 PRIMARY KEY(`rid`)
 )
-ENGINE=InnoDB COMMENT='积分记录表' DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;
-</code></pre>
+ENGINE=InnoDB COMMENT='积分记录表' DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;</code></pre>
 
 <p>上面的是一个很常见的用户信息表和积分记录表，用户有积分属性，积分有 <strong>收入</strong> 和 <strong>消费</strong> 两种状态，而 <code>records</code> 表记录了用户积分的变动历史。</p>
 
@@ -72,24 +71,21 @@ ENGINE=InnoDB COMMENT='积分记录表' DEFAULT CHARACTER SET=utf8 COLLATE=utf8_
 UPDATE `users` SET `point`=`point`+1000 WHERE `uid`=1;
 SELECT `point` FROM `users` WHERE `uid`=1;
 INSERT INTO `records`(`type`, `amount`, `balance`) VALUES ('1', '1000', ${point});
-COMMIT; OR ROLLBACK;
-</code></pre>
+COMMIT; OR ROLLBACK;</code></pre>
 
 <p>首先，更新用户信息表，将用户信息表中的积分字段加 1000，更新成功后，查询当前用户的积分数，然后第三步插入这条变更记录到 <code>records</code> 表，这样中间的第二步查询用户积分数这个必不可少，负责无法得到在第三步中的 <code>balance</code> 列的数据。这时候我们可以使用用户自定义变量来完成这个步骤。</p>
 
 <pre><code>START TRANSACTION;
 UPDATE `users` SET `point`=@balance WHERE `uid`=1 AND @balance:=`point`+1000;
 INSERT INTO `records`(`type`, `amount`, `balance`) VALUES ('1', '1000', @balance);
-COMMIT; OR ROLLBACK;
-</code></pre>
+COMMIT; OR ROLLBACK;</code></pre>
 
 <p>这样的好处就是减少了一次数据库查询(上面的第二步：查询用户当前积分数)，于是我们复制同样的过程于用户消费积分的过程中，不过这时候我们发现了一些异样：</p>
 
 <pre><code>START TRANSACTION;
 UPDATE `users` SET `point`=@balance WHERE `uid`=1 AND @balance:=`point`-3000;
 INSERT INTO `records`(`type`, `amount`, `balance`) VALUES ('0', '3000', @balance);
-COMMIT; OR ROLLBACK;
-</code></pre>
+COMMIT; OR ROLLBACK;</code></pre>
 
 <p>经过上面的两次增加积分操作，用户 uid=1 此时有 3000 的积分额度，我们对此用户执行消费 3000 积分的操作，但是此时第一步执行结果却是 <code>0 row(s) affected</code>，同时 <code>users</code> 表的 <code>point</code> 字段数值没有发生变化，仔细查看后发现问题出在 <code>AND @balance:=point-3000</code> 上，账户原本有 3000 积分，则 <code>@balance</code> 变量则为 <code>3000 - 3000 = 0</code> 积分，那么这个表达式的值便是 <code>0</code>，原来的 SQL 便变成了 <code>UPDATE users SET point=0 WHERE uid=1 AND 0</code>，这也难怪会出现 <code>0 row(s) affected</code> 了。</p>
 
@@ -98,8 +94,7 @@ COMMIT; OR ROLLBACK;
 <pre><code>START TRANSACTION;
 UPDATE `users` SET `point`=@balance WHERE `uid`=1 AND (@balance:=`point`-3000)+1;
 INSERT INTO `records`(`type`, `amount`, `balance`) VALUES ('0', '3000', @balance);
-COMMIT; OR ROLLBACK;
-</code></pre>
+COMMIT; OR ROLLBACK;</code></pre>
 
 <p>DONE。</p>
         </div>
@@ -150,7 +145,7 @@ COMMIT; OR ROLLBACK;
 <script type="text/javascript">
 var jiathis_config = {data_track_clickback:'true'};
 </script>
-<script type="text/javascript" src="http://v3.jiathis.com/code/jiathis_r.js?move=0&amp;btn=r3.gif&amp;uid=1375241479216400" charset="utf-8"></script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jiathis_r.js?type=left&amp;btn=l3.gif&amp;uid=1375241479216400" charset="utf-8"></script>
 <!-- JiaThis Button END -->
 <script type="text/javascript">
 var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");

@@ -85,8 +85,7 @@
 ……
 | eucjpms  | UJIS for Windows Japanese   | eucjpms_japanese_ci |      3 |
 +----------+-----------------------------+---------------------+--------+
-39 rows in set (0.00 sec)
-</code></pre>
+39 rows in set (0.00 sec)</code></pre>
 
 <p>在 MySQL 中任何给定的 character set 都至少提供一种 collation ，有的 character set 甚至包含多种 collation 。使用 <code>SHOW COLLATION</code> 命令列出当前系统所提供的 collation 。</p>
 
@@ -100,8 +99,7 @@
 ……
 | eucjpms_bin              | eucjpms  |  98 |         | Yes      |       1 |
 +--------------------------+----------+-----+---------+----------+---------+
-197 rows in set (0.01 sec)
-</code></pre>
+197 rows in set (0.01 sec)</code></pre>
 
 <p>要列出 <strong>utf8</strong> character set 支持的 collation ，执行<code>SHOW COLLATION LIKE 'utf8_%'</code>。</p>
 
@@ -115,8 +113,7 @@
 ……
 | utf8mb4_sinhala_ci       | utf8mb4 | 243 |         | Yes      |       8 |
 +--------------------------+---------+-----+---------+----------+---------+
-45 rows in set (0.01 sec)
-</code></pre>
+45 rows in set (0.01 sec)</code></pre>
 
 <p>MySQL 的 Collation 有以下特点：</p>
 
@@ -149,13 +146,11 @@ mysql&gt; SHOW VARIABLES LIKE 'collation_server';
 +------------------+-----------------+
 | collation_server | utf8_general_ci |
 +------------------+-----------------+
-1 row in set (0.00 sec)
-</code></pre>
+1 row in set (0.00 sec)</code></pre>
 
 <p>如果要进行修改，可以在启动的时候在启动参数或者配置文件中对 server 的 character set 和 collation 进行设定。其中启动参数可以使用 <code>--character-set-server</code> 和 <code>--collation-server</code> 来设定:</p>
 
-<pre><code>shell&gt; mysqld --character-set-server=utf8 --collation-server=utf8_general_ci
-</code></pre>
+<pre><code>shell&gt; mysqld --character-set-server=utf8 --collation-server=utf8_general_ci</code></pre>
 
 <p>也可以在配置文件中<code>[mysqld]</code>的段落使用 <code>character_set_server=charset</code> 和 <code>collation_server=collation</code>来设定:</p>
 
@@ -163,8 +158,7 @@ mysql&gt; SHOW VARIABLES LIKE 'collation_server';
 # -------------------------------------------------
 [mysqld]
 character_set_server=utf8
-collation_server=utf8_general_ci
-</code></pre>
+collation_server=utf8_general_ci</code></pre>
 
 <p>二者的效果是相同的。</p>
 
@@ -178,8 +172,7 @@ collation_server=utf8_general_ci
 
 <p><em>注意</em>：如果你想修改系统默认的 character set(latin1)和 collation(latin1<em>swedish</em>ci)，那么你必须在编译的时候指定</p>
 
-<pre><code>shell&gt; cmake . -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci
-</code></pre>
+<pre><code>shell&gt; cmake . -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci</code></pre>
 
 <p>cmake 编译的时候和 mysqld 启动的时候都会对指定的 character set 和 collation 进行合法性检查，如果不符合要求，那么程序将报错返回停止执行。</p>
 
@@ -195,8 +188,7 @@ collation_server=utf8_general_ci
 
 ALTER DATABASE db_name
     [[DEFAULT] CHARACTER SET charset_name]
-    [[DEFAULT] COLLATE collation_name]
-</code></pre>
+    [[DEFAULT] COLLATE collation_name]</code></pre>
 
 <p>这样可以单独设定每个 database 的 character set 和 collation ，在每个 database 目录下的 <strong>db.opt</strong> 文件中可以查看该 database 的 character set 和 collation 。这样就使得在同一个 server 下能存在不同 character set 和 collation 的 database。</p>
 
@@ -226,8 +218,7 @@ mysql&gt; SHOW VARIABLES LIKE 'collation_database';
 +--------------------+-----------------+
 | collation_database | utf8_general_ci |
 +--------------------+-----------------+
-1 row in set
-</code></pre>
+1 row in set</code></pre>
 
 <h3>2.3 Table Character Set &amp; Collation</h3>
 
@@ -239,8 +230,7 @@ mysql&gt; SHOW VARIABLES LIKE 'collation_database';
 
 ALTER TABLE tbl_name
     [[DEFAULT] CHARACTER SET charset_name]
-    [COLLATE collation_name]
-</code></pre>
+    [COLLATE collation_name]</code></pre>
 
 <p>Table 的 character set 和 collation 的设定规则如下：</p>
 
@@ -259,15 +249,13 @@ ALTER TABLE tbl_name
 
 <pre><code>col_name {CHAR | VARCHAR | TEXT} (col_length)
     [CHARACTER SET charset_name]
-    [COLLATE collation_name]
-</code></pre>
+    [COLLATE collation_name]</code></pre>
 
 <p>同样的，ENUM 或者 SET 类型的 column 也能进行单独的设定：</p>
 
 <pre><code>col_name {ENUM | SET} (val_list)
     [CHARACTER SET charset_name]
-    [COLLATE collation_name]
-</code></pre>
+    [COLLATE collation_name]</code></pre>
 
 <p>Column 的 character set 和 collation 的设定规则如下：</p>
 
@@ -277,8 +265,7 @@ ALTER TABLE tbl_name
 <pre><code>CREATE TABLE t1
 (
     col1 CHAR(10) CHARACTER SET utf8 COLLATE utf8_unicode_ci
-) CHARACTER SET latin1 COLLATE latin1_bin;
-</code></pre>
+) CHARACTER SET latin1 COLLATE latin1_bin;</code></pre>
 
 <p>如上面的例子：character set 和 collation 都明确指定了， 所以 <code>col1</code> 的character set 是 <strong>utf8</strong>，collation 是 <strong>utf8&#95;unicode&#95;ci</strong></p></li>
 <li><p>如果只指定了 <code>CHARACTER SET X</code> 而没有指定 <code>COLLATE</code> ，那么使用 <strong>X</strong> 和 <strong>X</strong> 对应默认的 collation</p>
@@ -286,8 +273,7 @@ ALTER TABLE tbl_name
 <pre><code>CREATE TABLE t1
 (
     col1 CHAR(10) CHARACTER SET utf8
-) CHARACTER SET latin1 COLLATE latin1_bin;
-</code></pre>
+) CHARACTER SET latin1 COLLATE latin1_bin;</code></pre>
 
 <p>如上面的例子：只指定了 <code>col1</code> 的 character set 是 <strong>utf8</strong>，但是没有指定 <code>COLLATE</code>，则 collation 使用<strong>utf8</strong>对应的默认的 collation 为 <strong>utf8<em>general</em>ci</strong>，</p></li>
 <li><p>如果只指定了 <code>COLLATE Y</code> 而没有指定 <code>CHARACTER SET</code> ，那么使用 <strong>Y</strong> 和 <strong>Y</strong> 对应关联的 character set</p>
@@ -295,8 +281,7 @@ ALTER TABLE tbl_name
 <pre><code>CREATE TABLE t1
 (
     col1 CHAR(10) COLLATE utf8_polish_ci
-) CHARACTER SET latin1 COLLATE latin1_bin;
-</code></pre>
+) CHARACTER SET latin1 COLLATE latin1_bin;</code></pre>
 
 <p>如上面的例子：<code>col1</code> 只指定了 collation 为 <strong>utf8&#95;polish&#95;ci</strong>，没有指定 character set，则 character set 使用 <strong>utf8&#95;polish&#95;ci</strong> 对应关联的 character set 为 <strong>utf8</strong>。</p></li>
 <li><p>除以上情况，使用 table 的 character set 和 collation</p>
@@ -304,8 +289,7 @@ ALTER TABLE tbl_name
 <pre><code>CREATE TABLE t1
 (
     col1 CHAR(10)
-) CHARACTER SET latin1 COLLATE latin1_bin;
-</code></pre>
+) CHARACTER SET latin1 COLLATE latin1_bin;</code></pre>
 
 <p>如上面的例子：<code>col1</code> 的 character set 为 <strong>latin1</strong>，collation 为 <strong>latin1&#95;bin</strong></p></li>
 </ol>
@@ -320,15 +304,13 @@ ALTER TABLE tbl_name
 
 <p>字符串可以使用 <strong>introducer</strong> 来指定 character set 同时使用 <code>COLLATE</code> 来指定 collation。</p>
 
-<pre><code>[_charset_name]'string' [COLLATE collation_name]
-</code></pre>
+<pre><code>[_charset_name]'string' [COLLATE collation_name]</code></pre>
 
 <p>例如：</p>
 
 <pre><code>SELECT 'string';
 SELECT _latin1'string';
-SELECT _latin1'string' COLLATE latin1_danish_ci;
-</code></pre>
+SELECT _latin1'string' COLLATE latin1_danish_ci;</code></pre>
 
 <p>例子中的第一条，<code>SELECT 'string'</code> 中的字符串使用 <code>character_set_connection</code> 和 <code>collation_connection</code> 定义的 character set 和 collation 。</p>
 
@@ -409,7 +391,7 @@ SELECT _latin1'string' COLLATE latin1_danish_ci;
 <script type="text/javascript">
 var jiathis_config = {data_track_clickback:'true'};
 </script>
-<script type="text/javascript" src="http://v3.jiathis.com/code/jiathis_r.js?move=0&amp;btn=r3.gif&amp;uid=1375241479216400" charset="utf-8"></script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jiathis_r.js?type=left&amp;btn=l3.gif&amp;uid=1375241479216400" charset="utf-8"></script>
 <!-- JiaThis Button END -->
 <script type="text/javascript">
 var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
