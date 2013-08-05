@@ -340,6 +340,7 @@ make install</code></pre>
 
 <pre><code>cd /usr/local/src
 tar zxvf re2c-0.13.6.tar.gz
+cd /usr/local/src/re2c-0.13.6
 ./configure
 make
 make install
@@ -347,9 +348,14 @@ make install
 cd /usr/local/src
 tar zxvf php-5.4.17.tar.gz
 cd /usr/local/src/php-5.4.17
-./configure --prefix=/usr/local/php --with-config-file-path=/usr/local/php/etc --enable-bcmath --enable-shmop --enable-sysvsem --enable-ftp --with-curl --with-curlwrappers --with-png-dir --with-jpeg-dir --with-freetype-dir --with-gd --enable-gd-native-ttf --enable-mbstring --enable-soap --enable-sockets --enable-zip --with-xmlrpc --with-mysql=/usr/local/mysql --with-mysqli=/usr/local/mysql/bin/mysql_config --with-pdo-mysql=/usr/local/mysql/ --enable-fpm --with-fpm-user=www --with-fpm-group=www --with-zlib --with-iconv-dir=/usr/local/libiconv/ --with-pcre-dir=/usr/local/pcre --with-libxml-dir --with-mcrypt=/usr/local/libmcrypt/ --with-mhash=/usr/local/mhash/ --disable-ipv6
+./configure --prefix=/usr/local/php --with-config-file-path=/usr/local/php/etc --enable-bcmath --enable-shmop --enable-sysvsem --enable-ftp --with-curl --with-curlwrappers --with-png-dir --with-jpeg-dir --with-freetype-dir --with-gd --enable-gd-native-ttf --enable-mbstring --enable-soap --enable-sockets --enable-zip --with-xmlrpc --with-mysql=/usr/local/mysql --with-mysqli=/usr/local/mysql/bin/mysql_config --with-pdo-mysql=/usr/local/mysql/ --enable-fpm --with-fpm-user=www --with-fpm-group=www --with-zlib --with-iconv-dir=/usr/local/libiconv/ --with-pcre-dir=/usr/local/pcre --with-libxml-dir --with-mcrypt=/usr/local/libmcrypt/ --with-mhash=/usr/local/mhash/ --disable-ipv6</code></pre>
+
+<p>如果使用 mysqlnd 驱动，则使用下面的编译方法（推荐）</p>
+
+<pre><code>./configure --prefix=/usr/local/php --with-config-file-path=/usr/local/php/etc --enable-bcmath --enable-shmop --enable-sysvsem --enable-ftp --with-curl --with-curlwrappers --with-png-dir --with-jpeg-dir --with-freetype-dir --with-gd --enable-gd-native-ttf --enable-mbstring --enable-soap --enable-sockets --enable-zip --with-xmlrpc --with-mysql=mysqlnd --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --enable-fpm --with-fpm-user=www --with-fpm-group=www --with-zlib --with-iconv-dir=/usr/local/libiconv/ --with-pcre-dir=/usr/local/pcre --with-libxml-dir --with-mcrypt=/usr/local/libmcrypt/ --with-mhash=/usr/local/mhash/ --disable-ipv6
+
 make
-# make test #注意:make test可能有错
+# make test # 安装前可以使用 make test 做一下测试，发现安装过程中的错误
 make install</code></pre>
 
 <h3>3.5 配置 php.ini 及 php-fpm.conf</h3>
@@ -389,7 +395,7 @@ expose_php = Off</code></pre>
 
 <p>同样的，生产环境中不推荐这么做</p>
 
-<pre><code>cp /usr/local/src/php-5.4.14/sapi/fpm/init.d.php-fpm /etc/rc.d/init.d/php-fpm
+<pre><code>cp /usr/local/src/php-5.4.17/sapi/fpm/init.d.php-fpm /etc/rc.d/init.d/php-fpm
 chmod 755 /etc/rc.d/init.d/php-fpm
 chkconfig --add php-fpm
 chkconfig --level 35 php-fpm on</code></pre>
@@ -528,6 +534,8 @@ server {
         index  index.php index.html;
     }
 
+    rewrite ^(.*)/attatchment/(.*)\.php$ /404.html  last;
+
     error_page  404              /404.html;
 
     # redirect server error pages to the static page /50x.html
@@ -548,6 +556,8 @@ server {
 
     location ~ .*\.(gif|jpg|jpeg|png|bmp|swf|js|ico|css)$ {
         expires      360d;
+        add_header Cache-Control no-cache;
+        add_header Cache-Control private;
     }
 
     location ~ /\. {
@@ -901,7 +911,7 @@ exit $?</code></pre>
 chkconfig --add nginx 
 chkconfig --level 35 nginx on
 
-service nginx restart</code></pre>
+service nginx start</code></pre>
 
 <h3>4.6 创建 webroot 目录</h3>
 
@@ -1019,6 +1029,20 @@ cd ..
 
 readonly LOGS_LIFETIME_MONTHS=12
 find . -mtime +$((${LOGS_LIFETIME_MONTHS}*30)) -exec rm -rf {} \;</code></pre>
+
+<h3>4.8 配置防火墙</h3>
+
+<p>配置防火墙，开启 80 端口</p>
+
+<pre><code>vi /etc/sysconfig/iptables</code></pre>
+
+<p>把这条规则添加到默认的 22 端口这条规则的下面</p>
+
+<pre><code>-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT</code></pre>
+
+<p>重新启动 iptables 服务</p>
+
+<pre><code>service iptables restart</code></pre>
 
 <h2>5 Memcached</h2>
 
