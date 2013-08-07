@@ -49,6 +49,10 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: bold;
     color: #111;
     line-height: 1em;
+    margin-bottom: 15px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 30px;
 }
 h1 {
     font-size: 2.5em;
