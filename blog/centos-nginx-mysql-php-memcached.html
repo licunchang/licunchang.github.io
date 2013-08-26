@@ -3,7 +3,14 @@
 <head>
 <meta charset="utf-8" />
 <meta name="keywords" content="PHP,SQL,MYSQL,LICUNCHANG,LNMP,CENTOS,NGINX">
-<meta name="description" content="LiCunchang(李存昌)的个人博客站点(licunchang.com)">
+<meta name="description" content="LNMP (Linux:CentOS6.4 + Nginx + MySQL + PHP) 安装文档
+ - licunchang.com">
+<meta property="og:type" content="article" />
+<meta property="og:title" content="LNMP (Linux:CentOS6.4 + Nginx + MySQL + PHP) 安装文档
+" />
+<meta property="og:url" content="http://licunchang.com/blog/centos-nginx-mysql-php-memcached.html" />
+<meta property="og:description" content="LNMP (Linux:CentOS6.4 + Nginx + MySQL + PHP) 安装文档
+ - licunchang.com" />
 <title>LNMP (Linux:CentOS6.4 + Nginx + MySQL + PHP) 安装文档
 </title>
 <link rel="stylesheet" href="http://licunchang.com/css/reset.css" />
@@ -83,8 +90,8 @@ enabled=1</code></pre>
 <li>nginx-1.4.2.tar.gz</li>
 <li>openssl-1.0.1e.tar.gz</li>
 <li>pcre-8.33.tar.gz</li>
-<li>mysql-5.5.32.tar.gz</li>
-<li>php-5.4.17.tar.gz</li>
+<li>mysql-5.5.33.tar.gz</li>
+<li>php-5.4.19.tar.gz</li>
 <li>libiconv-1.14.tar.gz</li>
 <li>mcrypt-2.6.8.tar.gz</li>
 <li>mhash-0.9.9.9.tar.gz</li>
@@ -121,8 +128,8 @@ chown -R mysql:mysql /etc/mysql</code></pre>
 <h3>2.3 源码安装</h3>
 
 <pre><code>cd /usr/local/src
-tar zxvf /usr/local/src/mysql-5.5.32.tar.gz
-cd /usr/local/src/mysql-5.5.32
+tar zxvf /usr/local/src/mysql-5.5.33.tar.gz
+cd /usr/local/src/mysql-5.5.33
 cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/data/mysql -DSYSCONFDIR=/etc/mysql -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci -DWITH_EXTRA_CHARSETS=all -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_ARCHIVE_STORAGE_ENGINE=1 -DWITH_BLACKHOLE_STORAGE_ENGINE=1 -DWITH_PERFSCHEMA_STORAGE_ENGINE=1 -DWITHOUT_EXAMPLE_STORAGE_ENGINE=1 -DWITHOUT_FEDERATED_STORAGE_ENGINE=1 -DWITHOUT_PARTITION_STORAGE_ENGINE=1 -DWITH_READLINE=1 -DWITH_LIBWRAP=1 -DENABLED_LOCAL_INFILE=1 -DENABLED_PROFILING=1 -DMYSQL_TCP_PORT=3306 -DWITH_ZLIB=bundled
 make
 make install</code></pre>
@@ -173,7 +180,7 @@ make install</code></pre>
   <p>This is a MySQL example config file for systems with 4GB of memory running mostly MySQL using InnoDB only tables and performing complex queries with few connections.    </p>
 </blockquote>
 
-<pre><code>cd /usr/local/src/mysql-5.5.32
+<pre><code>cd /usr/local/src/mysql-5.5.33
 cp ./support-files/my-medium.cnf /etc/mysql/my.cnf</code></pre>
 
 <p>编辑 my.cnf 文件</p>
@@ -196,9 +203,10 @@ long_query_time=2
 slow-query-log
 log-queries-not-using-indexes
 innodb_file_per_table
+expire_logs_days=7
 server-id=1
-log-bin=master-bin
-log-bin-index=master-bin.index</code></pre>
+log-bin=mysql-bin
+log-bin-index=mysql-bin.index</code></pre>
 
 <p>使用 InnoDB 打开以下选项</p>
 
@@ -346,13 +354,16 @@ make
 make install
 
 cd /usr/local/src
-tar zxvf php-5.4.17.tar.gz
-cd /usr/local/src/php-5.4.17
-./configure --prefix=/usr/local/php --with-config-file-path=/usr/local/php/etc --enable-bcmath --enable-shmop --enable-sysvsem --enable-ftp --with-curl --with-curlwrappers --with-png-dir --with-jpeg-dir --with-freetype-dir --with-gd --enable-gd-native-ttf --enable-mbstring --enable-soap --enable-sockets --enable-zip --with-xmlrpc --with-mysql=/usr/local/mysql --with-mysqli=/usr/local/mysql/bin/mysql_config --with-pdo-mysql=/usr/local/mysql/ --enable-fpm --with-fpm-user=www --with-fpm-group=www --with-zlib --with-iconv-dir=/usr/local/libiconv/ --with-pcre-dir=/usr/local/pcre --with-libxml-dir --with-mcrypt=/usr/local/libmcrypt/ --with-mhash=/usr/local/mhash/ --disable-ipv6</code></pre>
+tar zxvf php-5.4.19.tar.gz
+cd /usr/local/src/php-5.4.19</code></pre>
 
-<p>如果使用 mysqlnd 驱动，则使用下面的编译方法（推荐）</p>
+<p>使用 mysqlnd 驱动，则使用下面的编译方法（推荐）</p>
 
-<pre><code>./configure --prefix=/usr/local/php --with-config-file-path=/usr/local/php/etc --enable-bcmath --enable-shmop --enable-sysvsem --enable-ftp --with-curl --with-curlwrappers --with-png-dir --with-jpeg-dir --with-freetype-dir --with-gd --enable-gd-native-ttf --enable-mbstring --enable-soap --enable-sockets --enable-zip --with-xmlrpc --with-mysql=mysqlnd --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --enable-fpm --with-fpm-user=www --with-fpm-group=www --with-zlib --with-iconv-dir=/usr/local/libiconv/ --with-pcre-dir=/usr/local/pcre --with-libxml-dir --with-mcrypt=/usr/local/libmcrypt/ --with-mhash=/usr/local/mhash/ --disable-ipv6
+<pre><code>./configure --prefix=/usr/local/php --with-config-file-path=/usr/local/php/etc --enable-bcmath --enable-shmop --enable-sysvsem --enable-ftp --with-curl --with-curlwrappers --with-png-dir --with-jpeg-dir --with-freetype-dir --with-gd --enable-gd-native-ttf --enable-mbstring --enable-soap --enable-sockets --enable-zip --with-xmlrpc --with-mysql=mysqlnd --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --enable-fpm --with-fpm-user=www --with-fpm-group=www --with-zlib --with-iconv-dir=/usr/local/libiconv/ --with-pcre-dir=/usr/local/pcre --with-libxml-dir --with-mcrypt=/usr/local/libmcrypt/ --with-mhash=/usr/local/mhash/ --disable-ipv6</code></pre>
+
+<p>使用 libmysql 驱动，则使用下面的编译方法</p>
+
+<pre><code>./configure --prefix=/usr/local/php --with-config-file-path=/usr/local/php/etc --enable-bcmath --enable-shmop --enable-sysvsem --enable-ftp --with-curl --with-curlwrappers --with-png-dir --with-jpeg-dir --with-freetype-dir --with-gd --enable-gd-native-ttf --enable-mbstring --enable-soap --enable-sockets --enable-zip --with-xmlrpc --with-mysql=/usr/local/mysql --with-mysqli=/usr/local/mysql/bin/mysql_config --with-pdo-mysql=/usr/local/mysql/ --enable-fpm --with-fpm-user=www --with-fpm-group=www --with-zlib --with-iconv-dir=/usr/local/libiconv/ --with-pcre-dir=/usr/local/pcre --with-libxml-dir --with-mcrypt=/usr/local/libmcrypt/ --with-mhash=/usr/local/mhash/ --disable-ipv6
 
 make
 # make test # 安装前可以使用 make test 做一下测试，发现安装过程中的错误
@@ -395,7 +406,7 @@ expose_php = Off</code></pre>
 
 <p>同样的，生产环境中不推荐这么做</p>
 
-<pre><code>cp /usr/local/src/php-5.4.17/sapi/fpm/init.d.php-fpm /etc/rc.d/init.d/php-fpm
+<pre><code>cp /usr/local/src/php-5.4.19/sapi/fpm/init.d.php-fpm /etc/rc.d/init.d/php-fpm
 chmod 755 /etc/rc.d/init.d/php-fpm
 chkconfig --add php-fpm
 chkconfig --level 35 php-fpm on</code></pre>
