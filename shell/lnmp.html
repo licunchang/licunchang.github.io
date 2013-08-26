@@ -48,7 +48,7 @@
             <hr />
             <pre><code>#!/bin/bash
 #
-# description    Install nginx1.4.2 & mysql5.5.33 & php5.4.15 on CentOS6.4
+# description    Install nginx1.4.2 & mysql5.5.33 & php5.4.19 on CentOS6.4
 # author         LiCunchang(printf@live.com)
 # version        2.0.20130810
 
@@ -201,7 +201,7 @@ mysql::install() {
     fi
     
     if [[ "${memory_free}" -le 4096 && "${memory_free}" -gt 512 ]]; then
-        cp -f /usr/local/src/mysql-5.5.17/support-files/my-huge.cnf \
+        cp -f /usr/local/src/mysql-5.5.33/support-files/my-huge.cnf \
               /etc/mysql/my.cnf
     fi
     
