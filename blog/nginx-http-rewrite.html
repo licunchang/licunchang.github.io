@@ -115,13 +115,7 @@
     return 405;
 }</code></pre>
 
-<p>Examples 4 ??</p>
-
-<pre><code>if ($slow) {
-    limit_rate 10k;
-}</code></pre>
-
-<p>Examples 5 防止盗链</p>
+<p>Examples 4 防止盗链</p>
 
 <pre><code>valid_referers none blocked server_names *.example.com;
 if ($invalid_referer) {
@@ -139,6 +133,8 @@ if ($invalid_referer) {
 if (condition_1 &amp;&amp; condition_2) {
     # 不支持多条件判断
 }</code></pre>
+
+<p>另外，在 <code>location</code> 中使用 <code>if</code> 会有很多问题，很多情况下它的执行结果并不是你期望的那样，有些情况下甚至无法通过配置测试，或许最好的办法就是避免使用 <code>if</code>。</p>
 
 <h3>2.3 return</h3>
 
@@ -322,6 +318,8 @@ end of code</code></pre>
 <li>ngx&#95;http&#95;rewrite&#95;module模块 <a href="http://nginx.org/cn/docs/http/ngx_http_rewrite_module.html" title="ngx_http_rewrite_module模块">http://nginx.org/cn/docs/http/ngx&#95;http&#95;rewrite&#95;module.html</a></li>
 <li>Nginx Rewrite研究笔记 <a href="http://blog.cafeneko.info/2010/10/nginx_rewrite_note/" title="Nginx Rewrite研究笔记">http://blog.cafeneko.info/2010/10/nginx&#95;rewrite&#95;note</a> </li>
 <li>HttpCoreModule <a href="http://wiki.nginx.org/HttpCoreModule" title="HttpCoreModule">http://wiki.nginx.org/HttpCoreModule</a> </li>
+<li>IfIsEvil <a href="http://wiki.nginx.org/IfIsEvil" title="IfIsEvil">http://wiki.nginx.org/IfIsEvil</a> </li>
+<li>How nginx "location if" works <a href="http://agentzh.blogspot.com/2011/03/how-nginx-location-if-works.html" title="How nginx &quot;location if&quot; works">http://agentzh.blogspot.com/2011/03/how-nginx-location-if-works.html</a></li>
 </ol>
         </div>
 	</div>
