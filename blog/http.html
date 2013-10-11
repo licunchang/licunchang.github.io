@@ -223,6 +223,34 @@ If-None-Match: W/"v2.6"</code></pre>
 <li>附加一个 Expire 日期首部到响应中去</li>
 <li>不附加过期信息，让缓存确定自己的过期日期。</li>
 </ul>
+
+<p>no-Store 和 no-Cache 首部可以防止缓存提供未经证实的已缓存对象，标识为 no-store 的响应会禁止缓存对响应进行复制，缓存通常会像非缓存代理服务器一样，向客户端转发一条no-store响应，然后删除对象，不保存对象在本地缓存中。</p>
+
+<p>标识为 no-cache 的响应实际上是可以存储在本地缓存区中的，只是在与原始服务器进行新鲜度再验证之前缓存不能将其提供给客户端使用。<code>Pragma: no-cache</code> 是为了兼容 HTTP/1.0 。</p>
+
+<p><code>Cache-control: max-age</code> 表示的是从服务器将文档传来之时起，可以认为此文档处于新鲜状态的秒数，可以理解为缓存的最大生存周期，还有一个 <code>s-maxage</code> 首部，其行为与 max-age 。类似，但是仅适用于共享缓存。设置为0则不缓存文档，从而在每次访问的时候都进行刷新。</p>
+
+<p>不推荐使用 Expires 首部，他指定的是实际的过期日期而不是秒数，因为很多服务器的时钟都不同步或者不正确所以最好还是用剩余秒数而不是绝对时间来表示过期时间。</p>
+
+<p><code>mast-revalidate</code> 响应首部告诉缓存，在实现没有跟原始服务器进行再验证的情况下，不能提供这个对象的陈旧副本。</p>
+
+<h2>8 集成点：网关、隧道及中继</h2>
+
+<p>网关（gateway）可以作为某种翻译器使用，它抽象出了一种能够到达资源的方法，WEB 网关在一侧使用HTTP 协议，在另一侧使用另一种协议。</p>
+
+<p>可以用一个斜杠来分割客户端和服务器协议，并以此对网关进行描述：</p>
+
+<pre><code>&lt;客户端协议&gt;/&lt;服务器端协议&gt;</code></pre>
+
+<p>WEB 隧道可以通过HTTP 应用程序访问使用非HTTP 协议的应用程序。WEB 隧道允许用户通过HTTP 连接发送非HTTP 流量，这样就可以在 HTTP 上捎带其他协议数据了，使用 WEB 隧道最常见的原因就是要在 HTTP 连接中嵌入非 HTTP 流量，这样，这类流量就可以穿过只允许WEB 流量通过的防火墙了。</p>
+
+<h2>9 web 机器人</h2>
+
+<p>爬虫开始访问的 URL 出事集合被称作根集（root set），一个好的根集会包括一些大的流行web站点、一个新创建页面的列表和一个不经常被链接的无名页面列表。</p>
+
+<p>爬虫在web上爬行时，要特别小心不要陷入循环或环路中，爬虫必须知道他们到过何处，以避免环路的出现，环路会造成机器人陷阱，这些陷阱会暂停或减缓机器人的爬行进程。</p>
+
+<p>机器人要记录下哪些URL 已经访问过了时间很具挑战的事情，由于 URL 的数量巨大，所以要使用复杂的数据结构以便快速判定哪些URL是曾经访问过的。</p>
         </div>
 	</div>
     <div class="clear"></div>
@@ -276,6 +304,16 @@ var jiathis_config = {data_track_clickback:'true'};
 <script type="text/javascript">
 var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
 document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fce63e1ea00d8911ba91774df45e565f9' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-44786748-1', 'licunchang.com');
+  ga('send', 'pageview');
+
 </script>
 </body>
 </html>
