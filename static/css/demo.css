@@ -2,7 +2,7 @@ body {
 	background: #123;
 	color: #333;
 	height: auto;
-	font:12px/1.5 tahoma, arial, "Hiragino Sans GB", \5b8b\4f53;
+	font:12px/1.5 arial, sans-serif, \5b8b\4f53;
 }
 a {
 	color: #fff;
@@ -21,7 +21,7 @@ a:hover {
 .header {
 	font-size:2.5em;
 	line-height:2.5em;
-    font:12px/1.5 arial, \5b8b\4f53;
+    font-family: arial, sans-serif;
 }
 .header a:hover {
 	text-decoration: none;
