@@ -13,11 +13,13 @@
  - licunchang.com" />
 <title>《HTTP权威指南》读书笔记
 </title>
-<link rel="stylesheet" href="http://licunchang.com/css/reset.css" />
-<link rel="stylesheet" href="http://licunchang.com/css/text.css" />
-<link rel="stylesheet" href="http://licunchang.com/css/960_12_col.css" />
-<link rel="stylesheet" href="http://licunchang.com/css/demo.css" />
-<link rel="stylesheet" href="http://licunchang.com/css/markdown.css" />
+<link rel="stylesheet" href="http://licunchang.com/static/css/reset.css" />
+<link rel="stylesheet" href="http://licunchang.com/static/css/text.css" />
+<link rel="stylesheet" href="http://licunchang.com/static/css/960_12_col.css" />
+<link rel="stylesheet" href="http://licunchang.com/static/css/demo.css" />
+<link rel="stylesheet" href="http://licunchang.com/static/css/markdown.css" />
+<link rel="shortcut icon" href="http://licunchang.com/static/img/favicon.ico" />
+<link rel="icon" href="http://licunchang.com/favicon.ico" />
 </head>
 <body>
 <div class="container_12">
@@ -60,7 +62,8 @@
 
 <h2>2 URLs and Resources</h2>
 
-<pre><code>&lt;scheme&gt;://&lt;user&gt;:&lt;password&gt;@&lt;host&gt;:&lt;port&gt;/&lt;path&gt;;&lt;params&gt;?&lt;query&gt;#&lt;frag&gt;</code></pre>
+<pre><code>&lt;scheme&gt;://&lt;user&gt;:&lt;password&gt;@&lt;host&gt;:&lt;port&gt;/&lt;path&gt;;&lt;params&gt;?&lt;query&gt;#&lt;frag&gt;
+</code></pre>
 
 <p>几乎没有哪个 URL 中包含了所有这些组件。URL 最重要的 3 个部分是 scheme、host、path 。</p>
 
@@ -79,7 +82,8 @@
 
 <pre><code>start-line \r\n
 headers \r\n\r\n
-body</code></pre>
+body
+</code></pre>
 
 <p><strong>注意</strong>即使没有 headers 部分，也应该以一个空行结束。</p>
 
@@ -89,7 +93,8 @@ body</code></pre>
 
 <pre><code>HTTP/1.0 200 OK
 Server: Test Server
-    Version 1.0</code></pre>
+    Version 1.0
+</code></pre>
 
 <p>在上面的例子中，相应报文包含了一个 Server 首部，其值被划分成了多个延续行，该首部的完整值为 Test Server Version 1.0。</p>
 
@@ -196,7 +201,8 @@ Connection: keep-alive
 Expires: Mon, 04 Nov 2013 15:49:36 GMT
 Cache-Control: max-age=2592000
 Cache-Control: no-cache
-Cache-Control: private</code></pre>
+Cache-Control: private
+</code></pre>
 
 <p>Cache-Control: max-age=2592000 定义了文档的最大使用期（单位：秒），<code>Expires: Mon, 04 Nov 2013 15:49:36 GMT</code> 指定了一个绝对的过期日期。</p>
 
@@ -209,7 +215,8 @@ Cache-Control: private</code></pre>
 <p>有时候服务器希望在对文档进行一些非实质性或不重要的修改时，不要使所有的已缓存副本都失效，HTTP/1.1支持弱验证器，如果之对内容进行了少量修改，就允许服务器生命那是“足够好”的等价体。弱验证器会用前缀“W/”来标识弱验证器。</p>
 
 <pre><code>ETag: W/"v2.6"
-If-None-Match: W/"v2.6"</code></pre>
+If-None-Match: W/"v2.6"
+</code></pre>
 
 <p>如果服务器回送了一个实体标签，HTTP/1.1 就必须使用实体标签验证器，如果服务器只回送了一个 Last-Modified 值，客户端就可以使用 If-Modified-Since 验证，如果实体标签和最后修改日期都提供了，客户端就应该使用这两种再验证方案，这样 HTTP/1.0 和 HTTP/1.1 都能正确响应了，除非 HTTP/1.1 原始服务器无法生成实体标签验证器，否则就应该发送一个出去，如果使用弱实体标签有优势的话，发送的可能就是个弱实体标签，而不是强实体标签，而且最好同时发送一个最近修改值。如果HTTP/1.1缓存或服务器收到的请求包含两者，那么只有这两个条件都满足时，才能返回304 Not Modified 响应。</p>
 
@@ -240,7 +247,8 @@ If-None-Match: W/"v2.6"</code></pre>
 
 <p>可以用一个斜杠来分割客户端和服务器协议，并以此对网关进行描述：</p>
 
-<pre><code>&lt;客户端协议&gt;/&lt;服务器端协议&gt;</code></pre>
+<pre><code>&lt;客户端协议&gt;/&lt;服务器端协议&gt;
+</code></pre>
 
 <p>WEB 隧道可以通过HTTP 应用程序访问使用非HTTP 协议的应用程序。WEB 隧道允许用户通过HTTP 连接发送非HTTP 流量，这样就可以在 HTTP 上捎带其他协议数据了，使用 WEB 隧道最常见的原因就是要在 HTTP 连接中嵌入非 HTTP 流量，这样，这类流量就可以穿过只允许WEB 流量通过的防火墙了。</p>
 
@@ -251,6 +259,8 @@ If-None-Match: W/"v2.6"</code></pre>
 <p>爬虫在web上爬行时，要特别小心不要陷入循环或环路中，爬虫必须知道他们到过何处，以避免环路的出现，环路会造成机器人陷阱，这些陷阱会暂停或减缓机器人的爬行进程。</p>
 
 <p>机器人要记录下哪些URL 已经访问过了时间很具挑战的事情，由于 URL 的数量巨大，所以要使用复杂的数据结构以便快速判定哪些URL是曾经访问过的。</p>
+
+<p>没有任何简单明了的方式可以避免所有的环路，实际上，经过良好设计的机器人中要包含一组试探方式，以避免环路的出现。</p>
         </div>
 	</div>
     <div class="clear"></div>

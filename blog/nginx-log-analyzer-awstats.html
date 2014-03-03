@@ -13,11 +13,13 @@
  - licunchang.com" />
 <title>nginx 日志分析工具 awstats 使用简介
 </title>
-<link rel="stylesheet" href="http://licunchang.com/css/reset.css" />
-<link rel="stylesheet" href="http://licunchang.com/css/text.css" />
-<link rel="stylesheet" href="http://licunchang.com/css/960_12_col.css" />
-<link rel="stylesheet" href="http://licunchang.com/css/demo.css" />
-<link rel="stylesheet" href="http://licunchang.com/css/markdown.css" />
+<link rel="stylesheet" href="http://licunchang.com/static/css/reset.css" />
+<link rel="stylesheet" href="http://licunchang.com/static/css/text.css" />
+<link rel="stylesheet" href="http://licunchang.com/static/css/960_12_col.css" />
+<link rel="stylesheet" href="http://licunchang.com/static/css/demo.css" />
+<link rel="stylesheet" href="http://licunchang.com/static/css/markdown.css" />
+<link rel="shortcut icon" href="http://licunchang.com/static/img/favicon.ico" />
+<link rel="icon" href="http://licunchang.com/favicon.ico" />
 </head>
 <body>
 <div class="container_12">
@@ -57,14 +59,16 @@ tar zxf /usr/local/src/awstats-7.1.1.tar.gz
 mkdir -p /usr/local/awstats/
 cp -R /usr/local/src/awstats-7.1.1/* /usr/local/awstats/
 
-yum install perl</code></pre>
+yum install perl
+</code></pre>
 
 <h2>2 Configuration</h2>
 
 <p>awstats_configure.pl 文件能自动帮你生成配置文件，同时将配置文件放在 /etc/awstats/ 目录下。</p>
 
 <pre><code>cd /usr/local/awstats/
-perl /usr/local/awstats/tools/awstats_configure.pl</code></pre>
+perl /usr/local/awstats/tools/awstats_configure.pl
+</code></pre>
 
 <p>按照提示，输入相关的信息，对于 nginx 而言，提示</p>
 
@@ -76,7 +80,8 @@ perl /usr/local/awstats/tools/awstats_configure.pl</code></pre>
 
 <p>编辑配置文件 /etc/awstats/awstats.<em>website</em>.conf</p>
 
-<pre><code>vi /etc/awstats/awstats.www.licunchang.com.conf</code></pre>
+<pre><code>vi /etc/awstats/awstats.www.licunchang.com.conf
+</code></pre>
 
 <p>修改以下配置</p>
 
@@ -87,18 +92,21 @@ LogSeparator=" "
 SiteDomain="www.licunchang.com"
 DirData="/data/awstats"
 LoadPlugin="decodeutfkeys"
-DNSLookup=0</code></pre>
+DNSLookup=0
+</code></pre>
 
 <p>其中 <code>DNSlookup</code> 是用来根据参观者ip查询参观者的网域/国家信息，<code>LogFile</code>对应的是要分析的日志的完整路径，<code>LogFormat</code> 对应的是 nginx 默认的 main 日志格式，如下：</p>
 
 <pre><code>log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
                       '$status $body_bytes_sent "$http_referer" '
-                      '"$http_user_agent" "$http_x_forwarded_for"';</code></pre>
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+</code></pre>
 
 <p>其他格式的日志格式可以根据提醒改写 <code>LogFormat</code> 配置。其中的 <code>DirData</code> 存放 awstats 生成的分析数据，需要相应的读写权限。</p>
 
 <pre><code>mkdir -p /data/awstats
-chmod 777 -R /data/awstats</code></pre>
+chmod 777 -R /data/awstats
+</code></pre>
 
 <h2>3 Reporting</h2>
 
@@ -107,11 +115,13 @@ chmod 777 -R /data/awstats</code></pre>
 <pre><code>/usr/local/awstats/wwwroot/cgi-bin/awstats.pl -update -config=www.licunchang.com
 
 mkdir -p /data/web/awstats.licunchang.com
-chmod 777 -R /data/web/awstats.licunchang.com</code></pre>
+chmod 777 -R /data/web/awstats.licunchang.com
+</code></pre>
 
 <p>因为 nginx 对 Perl 的支持不太好，所以需要把 awstats 的统计数据生成 html 展现出来</p>
 
-<pre><code>/usr/local/awstats/tools/awstats_buildstaticpages.pl -update -config=www.licunchang.com -lang=cn -dir=/data/web/awstats.licunchang.com -awstatsprog=/usr/local/awstats/wwwroot/cgi-bin/awstats.pl</code></pre>
+<pre><code>/usr/local/awstats/tools/awstats_buildstaticpages.pl -update -config=www.licunchang.com -lang=cn -dir=/data/web/awstats.licunchang.com -awstatsprog=/usr/local/awstats/wwwroot/cgi-bin/awstats.pl
+</code></pre>
 
 <p>配置 nginx server，然后就可以通过域名访问统计数据。</p>
 
@@ -131,7 +141,8 @@ server {
         error_log off;
     }
 }
-EOF</code></pre>
+EOF
+</code></pre>
 
 <p>将图标和 css 文件拷贝到 web 目录下</p>
 
@@ -139,7 +150,8 @@ EOF</code></pre>
 mkdir -p /data/web/awstats.licunchang.com/awstatscss/
 
 cp -R /usr/local/awstats/wwwroot/icon/* /data/web/awstats.licunchang.com/awstatsicons/
-cp -R /usr/local/awstats/wwwroot/css/* /data/web/awstats.licunchang.com/awstatscss/</code></pre>
+cp -R /usr/local/awstats/wwwroot/css/* /data/web/awstats.licunchang.com/awstatscss/
+</code></pre>
 
 <h2>4 Crontab</h2>
 
@@ -179,7 +191,8 @@ for ((i=0; i&lt;$SITES_NUM; i++)); do
     if [[ $YESTERDAY_MONTH -lt $TODAY_MONTH ]]; then
         /usr/local/awstats/tools/awstats_buildstaticpages.pl -update -config=${SITES[i]} -lang=cn -dir=/data/web/awstats.licunchang.com -awstatsprog=/usr/local/awstats/wwwroot/cgi-bin/awstats.pl -month=${YESTERDAY_MONTH}
     fi
-done</code></pre>
+done
+</code></pre>
         </div>
 	</div>
     <div class="clear"></div>

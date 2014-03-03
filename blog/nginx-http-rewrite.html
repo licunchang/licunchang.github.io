@@ -13,11 +13,13 @@
  - licunchang.com" />
 <title>nginx rewrite 模块入门
 </title>
-<link rel="stylesheet" href="http://licunchang.com/css/reset.css" />
-<link rel="stylesheet" href="http://licunchang.com/css/text.css" />
-<link rel="stylesheet" href="http://licunchang.com/css/960_12_col.css" />
-<link rel="stylesheet" href="http://licunchang.com/css/demo.css" />
-<link rel="stylesheet" href="http://licunchang.com/css/markdown.css" />
+<link rel="stylesheet" href="http://licunchang.com/static/css/reset.css" />
+<link rel="stylesheet" href="http://licunchang.com/static/css/text.css" />
+<link rel="stylesheet" href="http://licunchang.com/static/css/960_12_col.css" />
+<link rel="stylesheet" href="http://licunchang.com/static/css/demo.css" />
+<link rel="stylesheet" href="http://licunchang.com/static/css/markdown.css" />
+<link rel="shortcut icon" href="http://licunchang.com/static/img/favicon.ico" />
+<link rel="icon" href="http://licunchang.com/favicon.ico" />
 </head>
 <body>
 <div class="container_12">
@@ -74,7 +76,8 @@
 <pre><code>if ($slow) {
     limit_rate 10k;
     break;
-}</code></pre>
+}
+</code></pre>
 
 <h3>2.2 if</h3>
 
@@ -101,26 +104,30 @@
 
 <pre><code>if ($http_user_agent ~ MSIE) {
     rewrite ^(.*)$ /msie/$1 break;
-}</code></pre>
+}
+</code></pre>
 
 <p>Examples 2 如果客户端 cookie 匹配正则，则设置 <code>$id</code> 为cookie值</p>
 
 <pre><code>if ($http_cookie ~* "id=([^;]+)(?:;|$)") {
     set $id $1;
-}</code></pre>
+}
+</code></pre>
 
 <p>Examples 3 如果客户端 request_method 为 <code>POST</code>，则返回 405</p>
 
 <pre><code>if ($request_method = POST) {
     return 405;
-}</code></pre>
+}
+</code></pre>
 
 <p>Examples 4 防止盗链</p>
 
 <pre><code>valid_referers none blocked server_names *.example.com;
 if ($invalid_referer) {
     return 403;
-}</code></pre>
+}
+</code></pre>
 
 <p><strong>注意</strong> nginx 是不支持 <code>if</code> 嵌套的，同时 <code>condition</code> 中不能使用多条件判断，下面的两则都是错误的。</p>
 
@@ -132,7 +139,8 @@ if ($invalid_referer) {
 
 if (condition_1 &amp;&amp; condition_2) {
     # 不支持多条件判断
-}</code></pre>
+}
+</code></pre>
 
 <p>另外，在 <code>location</code> 中使用 <code>if</code> 会有很多问题，很多情况下它的执行结果并不是你期望的那样，有些情况下甚至无法通过配置测试，或许最好的办法就是避免使用 <code>if</code>。</p>
 
@@ -191,7 +199,8 @@ if (condition_1 &amp;&amp; condition_2) {
     rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  last;
     return  403;
     ...
-}</code></pre>
+}
+</code></pre>
 
 <p>但是当上述指令写在 <code>/download/</code> 的 <code>location</code> 中时，应使用标志 <code>break</code> 代替 <code>last</code> ，否则 nginx 会重复10轮循环，然后返回错误500：</p>
 
@@ -199,11 +208,13 @@ if (condition_1 &amp;&amp; condition_2) {
     rewrite ^(/download/.*)/media/(.*)\..*$ $1/mp3/$2.mp3 break;
     rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  break;
     return  403;
-}</code></pre>
+}
+</code></pre>
 
 <p>如果 replacement 字符串包括新的请求参数，以往的请求参数会添加到新参数后面。如果不希望这样，在 replacement 字符串末尾加一个问号 <code>?</code>，就可以避免，比如：</p>
 
-<pre><code>rewrite ^/users/(.*)$ /show?user=$1? last;</code></pre>
+<pre><code>rewrite ^/users/(.*)$ /show?user=$1? last;
+</code></pre>
 
 <p>如果正则表达式中包含字符 <code>}</code> 或者 <code>;</code>，整个表达式应该被包含在单引号或双引号的引用中。</p>
 
@@ -211,7 +222,8 @@ if (condition_1 &amp;&amp; condition_2) {
 
 <p>rewrite 不对 <strong>hostname</strong> 或者 <strong>query string</strong> 进行操作，例如：</p>
 
-<pre><code>http://www.licunchang.com/user/info?id=2000&amp;t=1361235236</code></pre>
+<pre><code>http://www.licunchang.com/user/info?id=2000&amp;t=1361235236
+</code></pre>
 
 <p>rewrite 只能操作 <code>/user/info</code> 这一部分，也就是变量 <code>$uri</code> 的值，要对 <strong>query string</strong> 也就是变量 <code>$query_string</code> 或者 <code>$args</code> 的值进行操作可以使用 <code>$arg_PARAMETER</code> 变量，比如上面的 url ，<code>$arg_id</code> 的值就是 <code>20000</code>。</p>
 
@@ -219,13 +231,15 @@ if (condition_1 &amp;&amp; condition_2) {
     if ($args ~* "id=\d+$") {
         rewrite ^ $scheme://$host/userinfo.php?id=$arg_id? permanent;
     }
-}</code></pre>
+}
+</code></pre>
 
 <p>再比如要将 /friend.php?act=friend&amp;fid=200000 重定向到 /user_info.php?act=others&amp;uid=200000 使用下面的方法。</p>
 
 <pre><code>if ($args ~* "act=friend&amp;fid=\d+$"){
     rewrite ^/friend.php$ /user_info.php?act=others&amp;uid=$arg_fid? permanent;
-}</code></pre>
+}
+</code></pre>
 
 <h3>2.5 rewrite&#95;log</h3>
 
@@ -272,7 +286,8 @@ if (condition_1 &amp;&amp; condition_2) {
     }
 
     rewrite ^/(download/.*)/media/(.*)\..*$ /$1/mp3/$2.mp3 break;
-}</code></pre>
+}
+</code></pre>
 
 <p>将被翻译成下面这些指令：</p>
 
@@ -289,17 +304,20 @@ copy "/mp3/"
 copy $2
 copy ".mp3"
 end of regular expression
-end of code</code></pre>
+end of code
+</code></pre>
 
 <p>请注意没有对应上面的 limit&#95;rate 指令的内部指令，因为这个指令与 ngx&#95;http&#95;rewrite&#95;module 模块无关。nginx 会为这个 if 块单独创建一个配置，包含 limit&#95;rate 等于10k。如果条件为真，nginx将把这个配置指派给请求。</p>
 
 <p>指令</p>
 
-<pre><code>rewrite ^/(download/.*)/media/(.*)\..*$ /$1/mp3/$2.mp3 break;</code></pre>
+<pre><code>rewrite ^/(download/.*)/media/(.*)\..*$ /$1/mp3/$2.mp3 break;
+</code></pre>
 
 <p>可以通过将正则表达式中的第一个斜线“/”放入圆括号，来实现节约一个内部指令：</p>
 
-<pre><code>rewrite ^(/download/.*)/media/(.*)\..*$ $1/mp3/$2.mp3 break;</code></pre>
+<pre><code>rewrite ^(/download/.*)/media/(.*)\..*$ $1/mp3/$2.mp3 break;
+</code></pre>
 
 <p>对应的内部指令将会是这样：</p>
 
@@ -309,7 +327,8 @@ copy "/mp3/"
 copy $2
 copy ".mp3"
 end of regular expression
-end of code</code></pre>
+end of code
+</code></pre>
 
 <h2>References</h2>
 

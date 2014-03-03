@@ -13,11 +13,13 @@
  - licunchang.com" />
 <title>LNMP (Linux:CentOS6.4 + Nginx + MySQL + PHP) 安装文档
 </title>
-<link rel="stylesheet" href="http://licunchang.com/css/reset.css" />
-<link rel="stylesheet" href="http://licunchang.com/css/text.css" />
-<link rel="stylesheet" href="http://licunchang.com/css/960_12_col.css" />
-<link rel="stylesheet" href="http://licunchang.com/css/demo.css" />
-<link rel="stylesheet" href="http://licunchang.com/css/markdown.css" />
+<link rel="stylesheet" href="http://licunchang.com/static/css/reset.css" />
+<link rel="stylesheet" href="http://licunchang.com/static/css/text.css" />
+<link rel="stylesheet" href="http://licunchang.com/static/css/960_12_col.css" />
+<link rel="stylesheet" href="http://licunchang.com/static/css/demo.css" />
+<link rel="stylesheet" href="http://licunchang.com/static/css/markdown.css" />
+<link rel="shortcut icon" href="http://licunchang.com/static/img/favicon.ico" />
+<link rel="icon" href="http://licunchang.com/favicon.ico" />
 </head>
 <body>
 <div class="container_12">
@@ -54,7 +56,8 @@
 
 <pre><code>mkdir /mnt/cdrom
 mount /dev/cdrom /mnt/cdrom
-cd /etc/yum.repos.d/</code></pre>
+cd /etc/yum.repos.d/
+</code></pre>
 
 <p>禁用掉系统中其他的 yum 源有两种方式：  </p>
 
@@ -66,7 +69,8 @@ mv CentOS-Debuginfo.repo CentOS-Debuginfo.repo_licunchang.bak
 mv CentOS-Media.repo CentOS-Media.repo_licunchang.bak
 mv CentOS-Vault.repo CentOS-Vault.repo_licunchang.bak
 
-vi CentOS-Dvd.repo</code></pre>
+vi CentOS-Dvd.repo
+</code></pre>
 
 <p>文件中添加：</p>
 
@@ -74,15 +78,18 @@ vi CentOS-Dvd.repo</code></pre>
 name=CentOS-$releasever - Dvd
 baseurl=file:///mnt/cdrom/
 gpgcheck=0
-enabled=1</code></pre>
+enabled=1
+</code></pre>
 
 <p>重建 yum 缓存</p>
 
-<pre><code>yum makecache</code></pre>
+<pre><code>yum makecache
+</code></pre>
 
 <h3>1.2 编译工具等安装</h3>
 
-<pre><code>yum -y install make cmake gcc gcc-c++ chkconfig automake autoconf</code></pre>
+<pre><code>yum -y install make cmake gcc gcc-c++ chkconfig automake autoconf
+</code></pre>
 
 <h3>1.3 所需源码包</h3>
 
@@ -107,21 +114,24 @@ enabled=1</code></pre>
 
 <h3>2.1 安装依赖包</h3>
 
-<pre><code>yum -y install zlib zlib-devel ncurses ncurses-devel bison</code></pre>
+<pre><code>yum -y install zlib zlib-devel ncurses ncurses-devel bison
+</code></pre>
 
 <h3>2.2 创建运行账户及数据目录</h3>
 
 <p>添加一个 MySQL 使用的用户和用户组(<code>-r</code>:添加一个系统用户或用户组)：</p>
 
 <pre><code>/usr/sbin/groupadd -r mysql
-/usr/sbin/useradd -g mysql -M -r -s /bin/false mysql</code></pre>
+/usr/sbin/useradd -g mysql -M -r -s /bin/false mysql
+</code></pre>
 
 <p>将 MySQL 的数据文件放置在 /data/mysql 目录下，配置文件 my.cnf 放置在 /etc/mysql 目录下：</p>
 
 <pre><code>mkdir -p /data/mysql
 chown -R mysql:mysql /data/mysql
 mkdir -p /etc/mysql
-chown -R mysql:mysql /etc/mysql</code></pre>
+chown -R mysql:mysql /etc/mysql
+</code></pre>
 
 <p>MySQL 的 bin-log 是顺序写日志，需要提供较高的顺序写能力，MySQL 的数据日志需要提供较高的随机读写能力。与此同时，有条件的情况下将 bin-log 和数据文件分开存储是有益处的，而事务日志则可以和数据文件存放在一起。</p>
 
@@ -149,12 +159,14 @@ cmake /usr/local/src/mysql-5.6.13/ -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
                                    -DMYSQL_TCP_PORT=3306
 
 make
-make install</code></pre>
+make install
+</code></pre>
 
 <h3>2.4 初始化数据目录和数据</h3>
 
 <pre><code>cd /usr/local/mysql/
-/usr/local/mysql/scripts/mysql_install_db --user=mysql --basedir=/usr/local/mysql --datadir=/data/mysql</code></pre>
+/usr/local/mysql/scripts/mysql_install_db --user=mysql --basedir=/usr/local/mysql --datadir=/data/mysql
+</code></pre>
 
 <p>脚本会在程序根目录下生成一个配置文件 my.cnf ，没什么用，删掉。</p>
 
@@ -162,7 +174,8 @@ make install</code></pre>
 
 <pre><code>rm -f /etc/my.cnf
 rm -f /usr/local/mysql/my.cnf
-vi /etc/mysql/my.cnf</code></pre>
+vi /etc/mysql/my.cnf
+</code></pre>
 
 <p>5.6 的系统中默认不再分发my-huge.cnf、my-large.cnf、my-medium.cnf等几个默认配置文件，我们需要根据自己的情况来配置一个 my.cnf，下面的配置适合 2GB 内存服务器使用</p>
 
@@ -192,6 +205,7 @@ sql-mode                       = STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,
 sysdate-is-now                 = 1
 innodb                         = FORCE
 innodb-strict-mode             = 1
+explicit_defaults_for_timestamp
 
 # DATA STORAGE #
 datadir                        = /data/mysql/
@@ -242,7 +256,8 @@ server-id                      = 1
 
 [mysql]
 no-auto-rehash
-safe-updates</code></pre>
+safe-updates
+</code></pre>
 
 <p>添加字符集配置和慢查询日志，记录没有使用索引的查询，<code>general-log</code> 将开启一般日志，所有查询语句将记录到日志中，不推荐在生产环境中使用，仅限测试环境调试。log-bin 记录 master 服务器的 bin_log 的名称，如果不设置此选项，那么 MySQL 使用 <code>hostname-bin</code> 的形式，如果主机更改 hostname 那么 slaver 服务器将无法找到主服务器的 bin-log 从而产生错误，从这个角度上讲，设置一个 bin-log 名称是有必要的。</p>
 
@@ -260,62 +275,74 @@ safe-updates</code></pre>
 
 <pre><code>cp /usr/local/mysql/support-files/mysql.server  /etc/rc.d/init.d/mysql
 
-vi /etc/rc.d/init.d/mysql</code></pre>
+vi /etc/rc.d/init.d/mysql
+</code></pre>
 
 <p>编辑 MySQL 启动脚本，设置 basedir 和 datadir</p>
 
 <pre><code>basedir=/usr/local/mysql
-datadir=/data/mysql</code></pre>
+datadir=/data/mysql
+</code></pre>
 
 <p>增加执行权限</p>
 
 <pre><code>chmod 755 /etc/rc.d/init.d/mysql
 chkconfig --add mysql
-chkconfig --level 35 mysql on</code></pre>
+chkconfig --level 35 mysql on
+</code></pre>
 
 <p>启动 MySQL 服务</p>
 
-<pre><code>service mysql start</code></pre>
+<pre><code>service mysql start
+</code></pre>
 
 <h3>2.7 MySQL安全设置</h3>
 
 <p>MySQL 提供了一个脚本在安装初期修改密码的脚本，执行脚本，按照提醒即可对默认密码用户等进行修改</p>
 
 <pre><code>cd /usr/local/mysql/
-/usr/local/mysql/bin/mysql_secure_installation</code></pre>
+/usr/local/mysql/bin/mysql_secure_installation
+</code></pre>
 
 <p>登录 MySQL 服务器</p>
 
-<pre><code>/usr/local/mysql/bin/mysql -uroot -p</code></pre>
+<pre><code>/usr/local/mysql/bin/mysql -uroot -p
+</code></pre>
 
 <p>创建数据库</p>
 
 <pre><code>DROP DATABASE IF EXISTS `licunchang`;
-CREATE DATABASE IF NOT EXISTS `licunchang` DEFAULT CHARACTER SET 'utf8' DEFAULT COLLATE 'utf8_general_ci';</code></pre>
+CREATE DATABASE IF NOT EXISTS `licunchang` DEFAULT CHARACTER SET 'utf8' DEFAULT COLLATE 'utf8_general_ci';
+</code></pre>
 
 <p>授权用户</p>
 
-<pre><code>GRANT INSERT, DELETE, UPDATE, SELECT ON licunchang.* TO 'username'@'%' IDENTIFIED BY 'password' WITH GRANT OPTION;</code></pre>
+<pre><code>GRANT INSERT, DELETE, UPDATE, SELECT ON licunchang.* TO 'username'@'%' IDENTIFIED BY 'password' WITH GRANT OPTION;
+</code></pre>
 
 <h3>2.8 MySQL 防火墙设置</h3>
 
 <p>配置防火墙，开启 3306 端口</p>
 
-<pre><code>vi /etc/sysconfig/iptables</code></pre>
+<pre><code>vi /etc/sysconfig/iptables
+</code></pre>
 
 <p>把这条规则添加到默认的 22 端口这条规则的下面</p>
 
-<pre><code>-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT</code></pre>
+<pre><code>-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT
+</code></pre>
 
 <p>重新启动 iptables 服务</p>
 
-<pre><code>service iptables restart</code></pre>
+<pre><code>service iptables restart
+</code></pre>
 
 <h2>3 PHP</h2>
 
 <h3>3.1 安装依赖包</h3>
 
-<pre><code>yum -y install libxml2 libjpeg freetype libpng gd curl fontconfig libxml2-devel curl-devel libjpeg-devel libpng-devel freetype-devel</code></pre>
+<pre><code>yum -y install libxml2 libjpeg freetype libpng gd curl fontconfig libxml2-devel curl-devel libjpeg-devel libpng-devel freetype-devel
+</code></pre>
 
 <h3>3.2 安装 libiconv</h3>
 
@@ -324,7 +351,8 @@ tar zxvf libiconv-1.14.tar.gz
 cd /usr/local/src/libiconv-1.14
 ./configure --prefix=/usr/local/libiconv
 make
-make install</code></pre>
+make install
+</code></pre>
 
 <h3>3.2 安装 libmcrypt &amp; mhash &amp; mcrypt</h3>
 
@@ -355,12 +383,14 @@ export LDFLAGS="-L/usr/local/mhash/lib/ -I/usr/local/mhash/include/"
 export CFLAGS="-I/usr/local/mhash/include/"
 ./configure --prefix=/usr/local/mcrypt --with-libmcrypt-prefix=/usr/local/libmcrypt
 make
-make install</code></pre>
+make install
+</code></pre>
 
 <h3>3.3 创建 nginx 及 php-fpm 运行用户及用户组</h3>
 
 <pre><code>/usr/sbin/groupadd -r www
-/usr/sbin/useradd -g www -M -r -s /bin/false www</code></pre>
+/usr/sbin/useradd -g www -M -r -s /bin/false www
+</code></pre>
 
 <h3>3.4 安装 php</h3>
 
@@ -373,7 +403,8 @@ make install
 
 cd /usr/local/src
 tar zxvf php-5.5.4.tar.gz
-cd /usr/local/src/php-5.5.4</code></pre>
+cd /usr/local/src/php-5.5.4
+</code></pre>
 
 <p>使用 mysqlnd 驱动，则使用下面的编译方法（推荐）</p>
 
@@ -407,7 +438,8 @@ cd /usr/local/src/php-5.5.4</code></pre>
             --with-libxml-dir \
             --with-mcrypt=/usr/local/libmcrypt/ \
             --with-mhash=/usr/local/mhash/ \
-            --disable-ipv6</code></pre>
+            --disable-ipv6
+</code></pre>
 
 <p>使用 libmysql 驱动，则使用下面的编译方法</p>
 
@@ -444,7 +476,8 @@ cd /usr/local/src/php-5.5.4</code></pre>
 
 make
 # make test # 安装前可以使用 make test 做一下测试，发现安装过程中的错误
-make install</code></pre>
+make install
+</code></pre>
 
 <h3>3.5 配置 php.ini 及 php-fpm.conf</h3>
 
@@ -453,7 +486,8 @@ make install</code></pre>
 <pre><code>cp php.ini-production /usr/local/php/etc/php.ini
 rm -rf /etc/php.ini
 # ln -s /usr/local/php/etc/php.ini  /etc/php.ini
-cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf</code></pre>
+cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf
+</code></pre>
 
 <p>编辑 php-fpm.conf 文件</p>
 
@@ -461,7 +495,8 @@ cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf</code
 
 pid = run/php-fpm.pid
 user = www
-group = www</code></pre>
+group = www
+</code></pre>
 
 <p>pm 这几个选项在 php-fpm.conf 中有详细的功能描述，不清楚的可以查看文档注释</p>
 
@@ -470,14 +505,16 @@ group = www</code></pre>
 pm.max_children = 8
 pm.start_servers = 4
 pm.min_spare_servers = 1
-pm.max_spare_servers = 3</code></pre>
+pm.max_spare_servers = 3
+</code></pre>
 
 <p>编辑 php.ini 文件</p>
 
 <pre><code>vi /usr/local/php/etc/php.ini
 
 date.timezone = Asia/Shanghai
-expose_php = Off</code></pre>
+expose_php = Off
+</code></pre>
 
 <h3>3.6 把 php-fpm 加入系统启动</h3>
 
@@ -486,11 +523,13 @@ expose_php = Off</code></pre>
 <pre><code>cp /usr/local/src/php-5.5.4/sapi/fpm/init.d.php-fpm /etc/rc.d/init.d/php-fpm
 chmod 755 /etc/rc.d/init.d/php-fpm
 chkconfig --add php-fpm
-chkconfig --level 35 php-fpm on</code></pre>
+chkconfig --level 35 php-fpm on
+</code></pre>
 
 <p>启动 php-fpm</p>
 
-<pre><code>service php-fpm start</code></pre>
+<pre><code>service php-fpm start
+</code></pre>
 
 <h2>4 Nginx</h2>
 
@@ -501,7 +540,8 @@ tar zxvf pcre-8.33.tar.gz
 cd /usr/local/src/pcre-8.33
 ./configure  --prefix=/usr/local/pcre --enable-utf --enable-pcre16 --enable-pcre32 --enable-jit --enable-unicode-properties
 make
-make install</code></pre>
+make install
+</code></pre>
 
 <h3>4.2 安装nginx</h3>
 
@@ -509,20 +549,23 @@ make install</code></pre>
 tar zxvf openssl-1.0.1e.tar.gz
 
 tar zxvf nginx-1.4.2.tar.gz
-cd /usr/local/src/nginx-1.4.2</code></pre>
+cd /usr/local/src/nginx-1.4.2
+</code></pre>
 
 <p>安全原因，你可以修改 Nginx 的服务器标识信息</p>
 
 <pre><code>sed -i 's/nginx\b/Microsoft-IIS/g' ./src/core/nginx.h
 sed -i 's/1.4.2/7.5/' ./src/core/nginx.h
 sed -i 's/Server: nginx/Server: Microsoft-IIS/' ./src/http/ngx_http_header_filter_module.c
-sed -i 's/&gt;nginx&lt;/&gt;Microsoft-IIS&lt;/' ./src/http/ngx_http_special_response.c</code></pre>
+sed -i 's/&gt;nginx&lt;/&gt;Microsoft-IIS&lt;/' ./src/http/ngx_http_special_response.c
+</code></pre>
 
 <p>安装</p>
 
 <pre><code>./configure --with-http_stub_status_module --with-http_gzip_static_module --with-http_ssl_module --with-openssl=/usr/local/src/openssl-1.0.1e --user=www --group=www --prefix=/usr/local/nginx --with-pcre=/usr/local/src/pcre-8.33 --with-http_realip_module --with-cpu-opt=amd64
 make
-make install</code></pre>
+make install
+</code></pre>
 
 <h3>4.3 配置 nginx.conf 文件修改</h3>
 
@@ -599,7 +642,8 @@ http {
 
     include /usr/local/nginx/conf/servers/*.conf;
 
-}</code></pre>
+}
+</code></pre>
 
 <h3>4.4 添加 Server</h3>
 
@@ -654,7 +698,8 @@ server {
         deny all;
     }
 }
-# END --------------------------------------------- www.licunchang.com.conf</code></pre>
+# END --------------------------------------------- www.licunchang.com.conf
+</code></pre>
 
 <p>配置 phpmyadmin </p>
 
@@ -705,13 +750,15 @@ server {
         deny all;
     }
 }
-# END ------------------------------------------- mysql.licunchang.com.conf</code></pre>
+# END ------------------------------------------- mysql.licunchang.com.conf
+</code></pre>
 
 <p><code>mkdir -p /data/web/mysql.licunchang.com</code> 并上传 phpmyadmin 文件到 <strong>/data/web/mysql.licunchang.com</strong></p>
 
 <pre><code>mkdir -p /data/web/mysql.licunchang.com
 
-cd /data/web/mysql.licunchang.com</code></pre>
+cd /data/web/mysql.licunchang.com
+</code></pre>
 
 <p>配置 nginx 状态监控应用</p>
 
@@ -731,13 +778,15 @@ server {
 # END --------------------------------------------- status.licunchang.com.conf
 
 chown www:www /data/web/mysql.licunchang.com  -R
-chmod 744 /data/web/mysql.licunchang.com  -R</code></pre>
+chmod 744 /data/web/mysql.licunchang.com  -R
+</code></pre>
 
 <h3>4.5 把 nginx 加入系统启动</h3>
 
 <p>同样不推荐在生产环境中作为服务自动启动</p>
 
-<pre><code>vi /etc/rc.d/init.d/nginx</code></pre>
+<pre><code>vi /etc/rc.d/init.d/nginx
+</code></pre>
 
 <p>开机<a href="http://wiki.nginx.org/RedHatNginxInitScript">启动脚本</a>内容(有所修改)</p>
 
@@ -991,7 +1040,8 @@ case "$1" in
         echo "Usage: {start|stop|status|restart|reload|reopen-logs|configtest}"
         exit 2
 esac
-exit $?</code></pre>
+exit $?
+</code></pre>
 
 <p>启动脚本权限</p>
 
@@ -999,7 +1049,8 @@ exit $?</code></pre>
 chkconfig --add nginx 
 chkconfig --level 35 nginx on
 
-service nginx start</code></pre>
+service nginx start
+</code></pre>
 
 <h3>4.6 创建 webroot 目录</h3>
 
@@ -1029,16 +1080,19 @@ mkdir -p /data/web/mysql.licunchang.com
 cd /data/web/mysql.licunchang.com
 
 chown www:www /data/web/mysql.licunchang.com  -R
-chmod 744 /data/web/mysql.licunchang.com  -R</code></pre>
+chmod 744 /data/web/mysql.licunchang.com  -R
+</code></pre>
 
 <h3>4.7 nginx 日志切割</h3>
 
 <pre><code>mkdir -p /data/logs/nginx/
-mkdir -p /data/cron/</code></pre>
+mkdir -p /data/cron/
+</code></pre>
 
 <p>部署 nginx 日志切割任务 <code>crontab -u root -e</code>，每天零时切割日志</p>
 
-<pre><code>00 00 * * * /bin/bash /data/cron/nginx_logs_cut.sh</code></pre>
+<pre><code>00 00 * * * /bin/bash /data/cron/nginx_logs_cut.sh
+</code></pre>
 
 <p>创建脚本 <code>vi /data/cron/nginx_logs_cut.sh</code></p>
 
@@ -1116,21 +1170,25 @@ cd ${LOGS_BACKUP}
 cd ..
 
 readonly LOGS_LIFETIME_MONTHS=12
-find . -mtime +$((${LOGS_LIFETIME_MONTHS}*30)) -exec rm -rf {} \;</code></pre>
+find . -mtime +$((${LOGS_LIFETIME_MONTHS}*30)) -exec rm -rf {} \;
+</code></pre>
 
 <h3>4.8 配置防火墙</h3>
 
 <p>配置防火墙，开启 80 端口</p>
 
-<pre><code>vi /etc/sysconfig/iptables</code></pre>
+<pre><code>vi /etc/sysconfig/iptables
+</code></pre>
 
 <p>把这条规则添加到默认的 22 端口这条规则的下面</p>
 
-<pre><code>-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT</code></pre>
+<pre><code>-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
+</code></pre>
 
 <p>重新启动 iptables 服务</p>
 
-<pre><code>service iptables restart</code></pre>
+<pre><code>service iptables restart
+</code></pre>
 
 <h2>5 Memcached</h2>
 
@@ -1141,7 +1199,8 @@ tar zxvf libevent-2.0.21-stable.tar.gz
 cd /usr/local/src/libevent-2.0.21-stable
 ./configure  --prefix=/usr/local/libevent
 make
-make install</code></pre>
+make install
+</code></pre>
 
 <h3>5.2 安装memcached</h3>
 
@@ -1150,7 +1209,8 @@ tar zxvf memcached-1.4.15.tar.gz
 cd /usr/local/src/memcached-1.4.15
 ./configure  --prefix=/usr/local/memcached --with-libevent=/usr/local/libevent --enable-64bit
 make
-make install</code></pre>
+make install
+</code></pre>
         </div>
 	</div>
     <div class="clear"></div>

@@ -13,11 +13,13 @@
  - licunchang.com" />
 <title>SQL 中的 join 语法
 </title>
-<link rel="stylesheet" href="http://licunchang.com/css/reset.css" />
-<link rel="stylesheet" href="http://licunchang.com/css/text.css" />
-<link rel="stylesheet" href="http://licunchang.com/css/960_12_col.css" />
-<link rel="stylesheet" href="http://licunchang.com/css/demo.css" />
-<link rel="stylesheet" href="http://licunchang.com/css/markdown.css" />
+<link rel="stylesheet" href="http://licunchang.com/static/css/reset.css" />
+<link rel="stylesheet" href="http://licunchang.com/static/css/text.css" />
+<link rel="stylesheet" href="http://licunchang.com/static/css/960_12_col.css" />
+<link rel="stylesheet" href="http://licunchang.com/static/css/demo.css" />
+<link rel="stylesheet" href="http://licunchang.com/static/css/markdown.css" />
+<link rel="shortcut icon" href="http://licunchang.com/static/img/favicon.ico" />
+<link rel="icon" href="http://licunchang.com/favicon.ico" />
 </head>
 <body>
 <div class="container_12">
@@ -58,7 +60,8 @@
              2 | Marketing
              3 | Engineering
              4 | Clerical
-(4 行记录)</code></pre>
+(4 行记录)
+</code></pre>
 
 <p><strong>employee</strong></p>
 
@@ -72,7 +75,8 @@
              4 | Robinson
              4 | Smith
         [NULL] | John
-(6 行记录)</code></pre>
+(6 行记录)
+</code></pre>
 
 <p>PostgreSQL 代码(MySQL 对某些 SQL 语法不支持)如下：</p>
 
@@ -96,7 +100,8 @@ INSERT INTO employee VALUES('3', 'Jones');
 INSERT INTO employee VALUES('3', 'Steinberg');
 INSERT INTO employee VALUES('4', 'Robinson');
 INSERT INTO employee VALUES('4', 'Smith');
-INSERT INTO employee VALUES(NULL, 'John');</code></pre>
+INSERT INTO employee VALUES(NULL, 'John');
+</code></pre>
 
 <h2>1 内连接(inner join)</h2>
 
@@ -113,7 +118,8 @@ INSERT INTO employee VALUES(NULL, 'John');</code></pre>
              3 | Engineering     |             3 | Jones
              4 | Clerical        |             4 | Smith
              4 | Clerical        |             4 | Robinson
-(5 行记录)</code></pre>
+(5 行记录)
+</code></pre>
 
 <p>可以不使用 <code>INNER JOIN</code>，把表名用逗号隔开放到 <code>FROM</code> 字段，这样就是隐式 <strong>inner join</strong> ：</p>
 
@@ -126,7 +132,8 @@ INSERT INTO employee VALUES(NULL, 'John');</code></pre>
              3 | Engineering     |             3 | Jones
              4 | Clerical        |             4 | Smith
              4 | Clerical        |             4 | Robinson
-(5 行记录)</code></pre>
+(5 行记录)
+</code></pre>
 
 <p>上面的基于相等运算符的连接叫做等值连接(equi join)，它只是连接谓词用了相等比较的 <strong>inner join</strong>，SQL 提供了一种可选的简短符号去表达相等连接——使用 <code>USING</code> 关键字：</p>
 
@@ -139,7 +146,8 @@ INSERT INTO employee VALUES(NULL, 'John');</code></pre>
              3 | Engineering     | Jones
              4 | Clerical        | Smith
              4 | Clerical        | Robinson
-(5 行记录)</code></pre>
+(5 行记录)
+</code></pre>
 
 <p><code>USING</code> 在这里不仅仅是个<a href="http://en.wikipedia.org/wiki/Syntactic_sugar">语法糖（Syntactic sugar）</a>，上面查询的结果和使用显式谓词得到的查询得到的结果是不同的：特别地，在 USING 部分列出的列(column)将以只出现一次。</p>
 
@@ -154,7 +162,8 @@ INSERT INTO employee VALUES(NULL, 'John');</code></pre>
              4 | Clerical        |             1 | Rafferty
              4 | Clerical        |             3 | Jones
              4 | Clerical        |             3 | Steinberg
-(5 行记录)</code></pre>
+(5 行记录)
+</code></pre>
 
 <p>只不过这条语句的结果没有任何意义。</p>
 
@@ -171,7 +180,8 @@ INSERT INTO employee VALUES(NULL, 'John');</code></pre>
              3 | Steinberg     | Engineering
              4 | Robinson      | Clerical
              4 | Smith         | Clerical
-(5 行记录)</code></pre>
+(5 行记录)
+</code></pre>
 
 <p><strong>inner join</strong> 可以用下面的文氏图（<a href="http://en.wikipedia.org/wiki/Venn_diagram" title="Venn diagram">Venn diagram</a>）大概表示。</p>
 
@@ -211,7 +221,8 @@ INSERT INTO employee VALUES(NULL, 'John');</code></pre>
              4 | Clerical        |             4 | Robinson
              4 | Clerical        |             4 | Smith
              4 | Clerical        |        [NULL] | John
-(24 行记录)</code></pre>
+(24 行记录)
+</code></pre>
 
 <p>隐式交叉连接：</p>
 
@@ -243,7 +254,8 @@ INSERT INTO employee VALUES(NULL, 'John');</code></pre>
              4 | Clerical        |             4 | Robinson
              4 | Clerical        |             4 | Smith
              4 | Clerical        |        [NULL] | John
-(24 行记录)</code></pre>
+(24 行记录)
+</code></pre>
 
 <p>交叉连接 <strong>不会应用任何谓词</strong> 去过滤结果表中的记录。</p>
 
@@ -267,7 +279,8 @@ INSERT INTO employee VALUES(NULL, 'John');</code></pre>
              4 | Robinson      |             4 | Clerical
              4 | Smith         |             4 | Clerical
         [NULL] | John          |        [NULL] | [NULL]
-(6 行记录)</code></pre>
+(6 行记录)
+</code></pre>
 
 <p>这个查询的是列出每个雇员所在的部门，即使该雇员不在任何部门任职。</p>
 
@@ -291,7 +304,8 @@ INSERT INTO employee VALUES(NULL, 'John');</code></pre>
              3 | Jones         |             3 | Engineering
              4 | Smith         |             4 | Clerical
              4 | Robinson      |             4 | Clerical
-(6 行记录)</code></pre>
+(6 行记录)
+</code></pre>
 
 <p>这个查询的是每个部门下的雇员，即使是没有雇员在该部门任职。</p>
 
@@ -318,7 +332,8 @@ INSERT INTO employee VALUES(NULL, 'John');</code></pre>
              4 | Clerical        |             4 | Smith
              4 | Clerical        |             4 | Robinson
         [NULL] | [NULL]          |        [NULL] | John
-(7 行记录)</code></pre>
+(7 行记录)
+</code></pre>
 
 <p>一些数据库系统(如 MySQL)并不直接支持全连接，但它们可以通过左右外连接的并集(union)来模拟实现. 和上面等价的实例:</p>
 
@@ -333,7 +348,8 @@ INSERT INTO employee VALUES(NULL, 'John');</code></pre>
         [NULL] | [NULL]        |             2 | Marketing
              3 | Jones         |             3 | Engineering
              4 | Smith         |             4 | Clerical
-(7 行记录)</code></pre>
+(7 行记录)
+</code></pre>
 
 <p><strong>full outer join</strong> 可以用下面的文氏图（<a href="http://en.wikipedia.org/wiki/Venn_diagram" title="Venn diagram">Venn diagram</a>）大概表示。</p>
 
