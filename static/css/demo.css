@@ -21,6 +21,7 @@ a:hover {
 .header {
 	font-size:2.5em;
 	line-height:2.5em;
+    font:12px/1.5 arial, \5b8b\4f53;
 }
 .header a:hover {
 	text-decoration: none;
