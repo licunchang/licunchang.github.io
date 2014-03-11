@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url>
+    <loc>http://licunchang.com/shell/lnmp.html</loc>
+    <lastmod>2013-11-22T16:17:01+08:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+
+<url>
+    <loc>http://licunchang.com/blog/centos-nginx-mysql-php-memcached.html</loc>
+    <lastmod>2013-10-29T15:52:46+08:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+
+<url>
+    <loc>http://licunchang.com/blog/http.html</loc>
+    <lastmod>2013-10-11T14:31:44+08:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+
+<url>
+    <loc>http://licunchang.com/blog/nginx-http-rewrite.html</loc>
+    <lastmod>2013-09-18T15:45:17+08:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+
+<url>
+    <loc>http://licunchang.com/blog/gmt-utc-dst-cst.html</loc>
+    <lastmod>2013-08-04T09:37:33+08:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+
+<url>
+    <loc>http://licunchang.com/blog/nginx-log-analyzer-awstats.html</loc>
+    <lastmod>2013-07-25T14:01:47+08:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+
+<url>
+    <loc>http://licunchang.com/blog/mysql-user-defined-variables-example-1.html</loc>
+    <lastmod>2013-07-22T12:28:46+08:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+
+<url>
+    <loc>http://licunchang.com/blog/vim-textwidth-80.html</loc>
+    <lastmod>2013-06-27T19:22:44+08:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+
+<url>
+    <loc>http://licunchang.com/blog/sql-join.html</loc>
+    <lastmod>2013-06-05T13:19:13+08:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+
+<url>
+    <loc>http://licunchang.com/shell/nginx-init.html</loc>
+    <lastmod>2013-06-03T17:25:13+08:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+
+<url>
+    <loc>http://licunchang.com/shell/nginx-logs-cut.html</loc>
+    <lastmod>2013-06-03T12:19:10+08:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+</urlset>

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /blog
 Allow: /shell
-Disallow: /css
+Disallow: /static
