@@ -1,5 +1,6 @@
 function FindProxyForURL(url, host) {
     if (isPlainHostName(host) ||
+        dnsDomainIs(host, "chls.pro") ||
         dnsDomainIs(host, ".ke.com") ||
         dnsDomainIs(host, ".lianjia.com")) {
 
